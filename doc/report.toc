@@ -1,0 +1,4 @@
+\contentsline {section}{\numberline {1}Abstract}{2}{}%
+\contentsline {section}{\numberline {2}Hedging}{3}{}%
+\contentsline {section}{\numberline {3}Quantum Architectures}{4}{}%
+\contentsline {section}{\numberline {4}Deep Hedging}{5}{}%
