@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2024.9.14)  10 NOV 2024 20:19
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2024.9.14)  13 NOV 2024 22:34
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
-**/tmp/nvim.sohamd/FXDJPX/0
-(/tmp/nvim.sohamd/FXDJPX/0
+**/tmp/nvim.sohamd/97nfL4/0
+(/tmp/nvim.sohamd/97nfL4/0
 LaTeX2e <2021-11-15> patch level 1
 L3 programming layer <2022-01-21>
 (/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
@@ -225,8 +225,8 @@ File: l3backend-pdftex.def 2022-01-12 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count282
 \l__pdf_internal_box=\box56
 )
-(./report.aux)
-\openout1 = `report.aux'.
+(./progress.aux)
+\openout1 = `progress.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 36.
 LaTeX Font Info:    ... okay on input line 36.
@@ -277,9 +277,9 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 38.
 
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-) (./report.toc)
+) (./progress.toc)
 \tf@toc=\write3
-\openout3 = `report.toc'.
+\openout3 = `progress.toc'.
 
 
 [1
@@ -309,15 +309,15 @@ LaTeX Warning: Citation `stateprep2' on page 4 undefined on input line 93.
 
 ] [7
 
-] (./report.aux)
+] (./progress.aux)
 
 LaTeX Warning: There were undefined references.
 
  ) 
 Here is how much of TeX's memory you used:
  4770 strings out of 480247
- 75934 string characters out of 5896151
- 550469 words of memory out of 5000000
+ 75960 string characters out of 5896151
+ 552473 words of memory out of 5000000
  22651 multiletter control sequences out of 15000+600000
  477122 words of font info for 59 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
@@ -333,7 +333,7 @@ public/amsfonts/cm/cmr17.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/
 amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts
 /cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cm
 sy7.pfb>
-Output written on report.pdf (7 pages, 137154 bytes).
+Output written on progress.pdf (7 pages, 146175 bytes).
 PDF statistics:
  83 PDF objects out of 1000 (max. 8388607)
  51 compressed objects within 1 object stream

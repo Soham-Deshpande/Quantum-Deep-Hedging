@@ -108,11 +108,47 @@ $$|x\rangle = \otimes^N_{i=1} cos(x_i)|0\rangle + sin(x_i)|1\rangle$$
 
 
 \section{Quantum Architectures}
-\subsection{Measurement and Weak Measurement}
+\subsection{Measurements}
+\subsubsection{Complete Measurements}
+In quantum mechanics, we can define measurement to be any process that probes a 
+given quantum system to obtain information, we may also refer to this process as 
+a measurement in the computational basis when focussing on quantum information 
+science. Let's consider a quantum state 
+$|\psi \rangle = \alpha_0|0\rangle+\alpha_1|1\rangle$ which gives us $|0\rangle$
+with probability $|\alpha_0|^2$ and $|1\rangle$ with probability $|\alpha_1|^2$. 
+If measured in the standard basis we would expect the outcome to be $|k\rangle$
+(for k = 0,1)with a given probability. This outcome would result in the output 
+state of the measurement gate to also be $|k\rangle$, resulting in the original 
+state $|\psi\rangle$ to be irreversibly lost. We can refer to the process the state 
+undergoes as a collapse of state. 
+
+
+\subsection{Weak Measurements}
+
+Consider an arbitrary system observable A. Assume a probe $[\hat{q}.\hat{p}] = i$
+in a minimum uncertainty state, defined by $\sigma^{in}_p$,$\bar{p}^{in}$, and 
+$\bar{q}^{in}=0$. We can then assume a Von Neumann type interaction between the 
+observable of interest and the position of the particle, consequence being the 
+probe receiving a momentum kick when it interacts with the system and that the 
+change in the momentum is exactly equal to the observable to be measured, $\hat{A}$. 
+Mathematically, we can define $\hat{A}(p^t) = p^t-p^{in}$ to be the estimate we 
+get for $A$ from measuring probe $\bar{p}^t$. Then for intial system state $|\psi^{in}\rangle$, 
+$E[\psi_{in}|A(p^t)|\psi^{in}]=\langle|\hat{A}|\psi^{in}\rangle$.\\
+Now consider a final projective measurement on the system too, considering the 
+sub-enemble where the system is found in state $|\phi^t\rangle$. Then we can consider 
+the post-selected average $E[A(p^t)|\psi^{in},\phi^{t}]$.
+In the weak measurement limit, $\sigma_p\rightarrow\infty$ we get the expectation value for the estimate 
+of the observable A given by: 
+
+$$E[A(p^t)|\psi^{in},\phi^t]\rightarrow Re\frac{\langle\phi^y|\hat{A}|\psi^{in}}{\langle\phi^t|\psi^t\rangle}$$
+The amount of disturbance to any system operator due to the coupling of the probe is very small. 
+
+
 Can we use weak measurement to sample the qcbm continuously?\\
 look at the weak measurement protocol.
 Different to the standard orthogonal projection. 
 %https://github.com/Sjd-Hz/Weak-measurement-in-IBM-Qiskit/blob/main/How%20to%20implement%20weak%20measurement%20in%20IBM%20Qiskit.ipynb
+
 
 
 \section{Quantum Resevoir Computing}
