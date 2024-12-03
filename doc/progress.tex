@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[12pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{graphicx}
@@ -7,17 +7,26 @@
 \usepackage{listings}
 \usepackage{color}
 \usepackage{braket}
+\usepackage{pgfgantt}
+\usepackage{subcaption}
+\usepackage{tabularx}
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5
 \definecolor{mauve}{rgb}{0.58,0,0.82}
 
+\graphicspath{{figures}}
 
-\usepackage[
-backend=biber,
-style=alphabetic,
-sorting=ynt
-]{biblatex}
-\addbibresource{example}
+\usepackage{geometry}
+ \geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=25mm,
+ right = 25mm,
+ top=30mm,
+ bottom=35mm
+ }
+\usepackage[backend=biber]{biblatex}
+\addbibresource{zotero.bib}
 
 \numberwithin{equation}{section}
 
@@ -29,8 +38,7 @@ sorting=ynt
   belowskip=3mm,
   showstringspaces=false,
   columns=flexible,
-  basicstyle={\small\ttfamily},
-  numbers=none,
+  basicstyle={\small\ttfamily},  numbers=none,
   numberstyle=\tiny\color{gray},
   keywordstyle=\color{blue},
   commentstyle=\color{dkgreen},
@@ -56,16 +64,20 @@ sorting=ynt
 \pagenumbering{roman}
 
 
-\section*{Abstract}
-\begin{Abstract}
+\begin{abstract}
 Parameterised Quantum Circuits (PQCs) have opened many doors, one 
-such being the use in financial markets. Through the Quantum Circuit 
-Born Machine (QCBM), we are able to generate synthetic data that mimics the 
-statistical distribution of the original dataset. In this research we are generating 
-synthetic market data; here the dynamics of a given vanilla option is learnt. 
-The market generator is then used to simulate the option 
-to maturity with the intent of learning an optimal hedging strategy $\pi^*$, a 
-showcase of a data-driven approach to risk hedging. 
+such being the use in financial markets. In this paper, I look at the problem 
+of optimally hedging a portfolio of derivatives through the use of quantum computing. 
+Given a Quantum Circuit Born Machine (QCBM), we are able to generate synthetic 
+data that mimics the statistical distribution of the original dataset. 
+We are generating synthetic market data, here the dynamics of a 
+given vanilla option is learnt. The market generator is then used to simulate the 
+option to maturity with the intent of learning an optimal hedging strategy $\pi^*$, a 
+showcase of a data-driven approach to risk hedging. Different generator architectures
+will be compared to maximise the quality of the synthetic data. The findings of 
+this research will contribute to the growing literature on risk management in 
+quantitative finance, with applications of the market generator extending beyond 
+deep hedging. 
 \end{abstract}
 \clearpage
 
@@ -76,28 +88,67 @@ showcase of a data-driven approach to risk hedging.
 
 \pagenumbering{arabic}
 
-
-\section{Related Literature}
-To place this research within the context of existing literature, we can split 
-the project into 2 components: the market generator for options data, 
-and quantum parameterised circuits.\\ 
+\section{Problem Statement}
+The problem of hedging a portfolio of derivatives is an important part of 
+risk management used widely in financial institutions. We can picture a perfect, 
+frictionless market where transaction costs are negligible and every asset in 
+the space has a price. Here we can price and hedge perfectly. Unfortunately in 
+practice, we experience incomplete markets due to frictions. In recent years 
+markets have experienced periods of heightened volatility, much that disobey 
+traditional frameworks. This generates the need for complex, realistic market 
+models that can account for these.\\ 
 Traditional methods of pricing options has shown to be ineffective for equity 
 markets, new information resulting in rapid changes. Much of the available 
 literature models the market as a smooth, continuous stochastic process within 
 a Gaussian space. Such models are sufficient for common market activity but fail 
-when presented with discontinuous moves in price. In the context of commodities, 
+when presented with discontinuous moves in price. In the context of Euro Stoxx 50, 
 these can be reactions to geopolitical events or natural disasters; traditional
-models being incapable of capturing the effects. The introduction of Jump- diffusion 
+models being incapable of capturing the effects. The introduction of Jump-diffusion 
 models aimed to solve this issue though faces similar issues. In reaction we have 
 recently observed non-parametric models that harness neural networks and machine 
-learning which aim to demonstrate high accuracy on out-of-sample forecasts.\\
-Similarly, the work around deep hedging has evolved with time, moving away from 
+learning which aim to demonstrate high accuracy on out-of-sample forecasts.
+\\
+In the deep hedging framework, we are able to construct a dynamic optimal hedging 
+policy by following market simulations to maturity. This is a policy that involves 
+a mapping from market states to actions. Instead of solving analytical equations 
+under unrealistic market assumptions, such as Greek hedging, we can instead model
+the trading decisions made as an optimisation problem, particularly suitable for 
+neural networks with a rich feature set. This will be done by focusing on the 
+accuracy of the market simulation itself; I will aim to utilise quantum computing 
+techniques to enhance market simulations so that a more optimal hedging strategy 
+can be learnt than prior techniques. In this, an exploration into quantum circuit 
+architectures will be conducted, as well as exploiting quantum machine learning 
+for the simulation and policy search.
+
+\clearpage
+\section{Related Literature}
+To place this research within the context of existing literature, we can split 
+the project into 2 components: the market generator, and quantum parameterised circuits.
+\\
+The work around deep hedging has evolved with time, moving away from 
 greek-based and statistical hedging towards a more sturdy framework using machine 
-learning. Here a lot of work is being done, with many papers emphasising on using 
-neural networks for optimising delta and gamma exposure. In recent times, we have 
-also seen research done on using quantum computing to hedge portfolios, here the 
+learning. Here a lot of work is being done, with many papers emphasising 
+on using neural networks for optimising delta and gamma exposure.
+\autocite{Enhancing BS delta, Deep Gamma Hedging}.
+Beuhler introduced the initial approach, modeling trading decisions 
+as neural networks instead of relying on parameterised models.
+\autocite{Beuhler Deep Hedging} Many advancements were made after this with 
+researchers focussing on developing realistic market simulators. Wissel 
+proposed a market model for path generation of options but this still 
+employed risk-neutral diffusion. Wiese then introduced 
+a new dimension by using GANs by converting options into 
+local volatility models with simpler no-arbitrage constraints. This focussed 
+on the local stochastic nature of options. 
+\autocite{Learning to simulate equity markets}
+Some approaches suggest using actor-critic reinforcement learning algorithms to 
+solve for an optimal value function, a move towards searching for a global
+maximum instead of thinking about local risk management.\autocite{deep bellman}
+\\
+In recent times, we have also seen research done on using quantum computing to 
+hedge portfolios, here the 
 authors presented a quantum reinforcement learning method based on policy-search 
-and distributional actor-critic algorithms.\\
+and distributional actor-critic algorithms. The authors  \autocite{quantum deep hedging}
+\\
 There is an immense amount of research being done on exploiting the benefits of 
 quantum computing, recent advancements being in quantum algorithms. 
 These claim to provide exponential speed-up over classical 
@@ -109,11 +160,14 @@ and Quantum generative adversarial networks boasting high generalisation ability
 There has also been research in harnessing quantum weak measurements to enhance 
 the ability of quantum machine learning algorithms. In quantum reservoir computing,
 the ability to retain information from past inputs plays a key role in processing 
-temporal series and producing future predictions.  
+temporal series and producing future predictions.\autocite{fujii_quantum_2020}  
 \\
 This research aims to combine the needs of financial firms in hedging portfolios
-using realistic market models provided by utilising QCBMs for time-series data 
-in combination with quantum neural networks for learning optimal policies. 
+using realistic market models by utilising QCBMs as a tool 
+for simulating paths in combination with quantum neural networks for learning 
+optimal policies. A comparison will be made against simulating the underlying with 
+classical methods. 
+
 
 \clearpage
 \section{Markets and Derivatives}
@@ -153,13 +207,9 @@ trading strategy $\alpha$ requires no extra cost beyond the initial capital
 We can also make the following assumptions about the market:
 \begin{itemize}
   \item The market is liquid, allowing the trade to execute instantaneously
-  \item We do not pay transaction fees 
   \item There is no bid-ask spread, the price to buy and sell is the same 
   \item Trading actions taken have no impact on the price of the asset traded 
 \end{itemize}
-It is important to address that we have assumed a frictionless market, though 
-unrealistic, this constraint will be held for simplicity and may be explored in 
-further detail if time permits.
 
 
 \subsection{Derivatives}
@@ -175,21 +225,40 @@ gives the owner the right but not the obligation to buy a given asset $i$ at
 a specified price $K$ at time $T$. Similar to the Call, a Put option gives the 
 owner the right but not the obligation to sell a given asset $i$ at a price $K$ 
 at time $T$. If the owner can exercise the option any time up to $T$, we call 
-this an American option.
-\\
-Pricing options
+this an American option. For the purposes of this research, we will only be 
+dealing with Vanilla European options.\\ 
+It is important to define the payoffs for both options: 
+\begin{equation}
+C_T = max(0,S_T-K)
+\end{equation}
+\begin{equation}
+P_T = max(0,K-S_T)
+\end{equation}
 
+
+
+\subsection{Euro Stoxx 50}
+In this research I will be focussing on a single asset, the Euro Stoxx 50 Index
+(SX5E) and relevant derivatives. This is a stock index of 50 stocks in the Eurozone. 
+This index captures around 60\% of the free-float market capitalisation of the 
+Euro Stoxx Total Market Index which covers about 95\% of the free-float market 
+in the Eurozone. Rational behind choosing this index is the availability of data,
+options traded with it as the underlying and the liquidity of the index.\\
+Derivatives that are held in the portfolio to be hedged will include those that 
+have SX5E as the underlying, examples are weekly, monthly, and quarterly
+expiration options. These are European-style so can only be exercised upon 
+maturity. 
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.35]{sx5e.png}
+    \caption{Euro Stoxx 50 price chart}
+\end{figure}
 
 \clearpage
 \section{Deep Hedging}
-The problem of hedging a portfolio of derivatives is an important part of 
-risk management used widely in financial institutions. We can picture a perfect, 
-frictionless market where transaction costs are negligible and every asset in 
-the space has a price. Here we can price and hedge perfectly. Unfortunately in 
-practice, we experience incomplete markets due to frictions. This generates the
-need for complex, realistic market models that can account for these. Hedging can
-be thought of as a stochastic control problem where we have 3 actors, a market 
-state,randomness from market returns and a hedging strategy. By making 
+
+Hedging can be thought of as a stochastic control problem where we have 3 actors, 
+a market state, randomness from market returns and a hedging strategy. By making 
 observations on the market state we are required to make adjustments to one's
 hedging policy. 
 \\
@@ -198,10 +267,50 @@ $$\min_{\theta \in \Theta} \rho (H^\theta - P)$$
 where $\Theta$ is the set of admissible hedging strategies, $P$ is the uncertain 
 payoff of derivative at final time, $H^\theta$ is the uncertain payoff of hedging 
 portfolio if strategy $\theta$ is used at final time, and $\rho$ is a risk measure.
+\\
+It can be assumed that the hedging instrument used, SX5E in this case, can be 
+traded with sufficient liquidity and that the trading of the asset does not 
+influence the price. Given these conditions, we can formulate the problem of deep 
+hedging to be a reinforcement learning one. 
+\\
+We can set up two sets of rewards, R, positive from the cash flows from the 
+portfolio of hedging instruments and derivatives. The second is C, the negative 
+reward associated with transaction costs. For simplicity, we can assume that the 
+cost is proportional to the cost of the hedging instrument. By taking a set of 
+actions at each time step, t, we can formulate a trading strategy which gives an 
+expected return of
+$T^\pi_t = (R^\pi_{t+1} - C^\pi_{t+1} )+ ... +(R^\pi_T - C^\pi_T)$.
+The goal of the reinforcement algorithm would be to maximise the expected return. 
+However, to create a strategy that does not incur too much risk, it is important 
+to include metrics such as Value at Risk (VaR) and Conditional Value at Risk(CVAR).
+These aim to minimise the tail-risk involved in a given trading strategy hence 
+creating a more robust strategy and conforming to regulations such as Basel III.
+\cite{The New International Regulation of Market Risk}
+\\
 
+SIMULATING MARKETS TO MATURITY PARAGRAPH
 
+\\
+The design of the neural network responsible would involve an input layer which
+takes the market state such as the underlying, and options features such as the 
+strike price and maturity.\\
+The loss function will have
+type: $\text{Loss }=\lambda_1\cdot\mathcal{L}_R + \lambda_2 \cdot \mathcal{L}_{CVaR}$
+where $\lambda_i$ is used to define a weighting to the two losses, $\mathcal{L}_R$ 
+is the replication loss from simulating the options to maturity given a generator. 
+We can define it as $\mathcal{L}_R(X^\alpha_T-g(S_t))$ where $X^\alpha_T$ is the 
+portfolio at maturity and $g(S_t)$ is the option pay-off.\\
+VaR can be defined as :
+\begin{equation}
+\text{VaR}_{\alpha}(X) = \inf \{x \in \mathbb{R} : P(X \leq x) \geq \alpha \}
+\end{equation}
+CVaR likewise: 
+\begin{equation}
+\text{CVaR}_{\alpha}(X) = \frac{1}{1 - \alpha} \int_{-\infty}^{\text{VaR}_{\alpha}(X)} x \cdot\, p(x) \, dx
+\end{equation}
 
-
+This takes a global approach towards finding an optimal policy instead of 
+managing a local criterion as suggested by \cite{Fecamp}.
 
 
 \clearpage 
@@ -210,7 +319,9 @@ A basic understanding of quantum mechanics and computing is assumed.
 \subsection{Born Rule}
 An essential part of modern quantum computing involves the existence of the Born
 Rule. Born's measurement rule states that:
-$$p(x) = |\langle x|\psi(\theta)|\rangle|^2$$
+\begin{equation}
+p(x) = |\langle x|\psi(\theta)|\rangle|^2
+\end{equation}
 The state $|\psi(\theta)\rangle$ is generated by evolving the vacuum state $|0\rangle$
 according to a Hamiltonian $H$ that is constructed from gates. Once combined, the 
 gates form a parameterised quantum circuit which is parameterised by using the 
@@ -222,15 +333,18 @@ treat the PQC as a generative model, which upon measuring in a given basis, will
 generate samples of a target distribution $\chi$. This model is parameterised 
 by $\theta$, which defines a quantum circuit $U(\theta)$ made up of a set of quantum 
 gates such that:
-$$|\psi(\theta)\rangle = U(\theta)|0\rangle^{\otimes n}$$
+\begin{equation}
+|\psi(\theta)\rangle = U(\theta)|0\rangle^{\otimes n}
+\end{equation}
 By measuring the circuit, we can obtain samples. Producing samples that emulate 
 the target distribution involves minimising the parameters of the circuit $U(\theta)$, 
 a process once convergence is reached, will generate accurate samples. 
-\cite{bornmachine} 
+\cite{bornmachine}
 
 \subsection{State Preparation}
 State preparation is a core part of the hybrid quantum computing model. This 
-concerns the most efficient methods to input classical data into a quantum system. 
+concerns the most efficient methods to input classical data into a quantum system.
+\\
 Without the use of ancillary qubits, we can expect an exponential circuit depth
 to prepare an arbitrary quantum state. Using them we can reduce the depth to be 
 sub-exponential scaling, with recent advancements reaching $\Theta(n)$ given $O(n^2)$
@@ -245,9 +359,10 @@ The main methods of state preparation include: basis, amplitude, angle encoding,
 and QRAM. 
 
 \subsubsection{Amplitude Encoding}
-$$ |\psi_x\rangle = \sum_{i-1}^Nx_i|i\rangle$$
 Amplitude encoding consists of the following transformation:\\
-$$S_X \ket{0} = \frac{1}{||x||}\sum^{2n}_{i=1}{x_i\ket{i}}$$
+\begin{equation}
+S_X \ket{0} = \frac{1}{||x||}\sum^{2n}_{i=1}{x_i\ket{i}}
+\end{equation}
 where each $x_i$ is a feature of the data point x, and $\ket{i}$ is the basis 
 of the n-qubit
 space. This does boast the advantage of being able to store $2^n$ features using 
@@ -255,7 +370,9 @@ only n qubits but does create a resultant circuit with depth $O(2^n)$.
 
 \subsubsection{Angle Encoding}
 The transformation used is:
-$$S_x\ket{0} = \otimes^n_{i=1} cos(x_i)\ket{0} + sin(x_i)\ket{1}$$
+\begin{equation}
+S_x\ket{0} = \otimes^n_{i=1} cos(x_i)\ket{0} + sin(x_i)\ket{1}
+\end{equation}
 It can be constructed using a single rotation with angle $x_i$ which is 
 normalised to be within $[-\pi,\pi]$. This allows us to store $n$ features with 
 $n$ qubits.
@@ -266,7 +383,6 @@ same can be said for amplitude encoding.
 
 
 \subsection{Measurements}
-\subsubsection{Complete Measurements}
 In quantum mechanics, we can define measurement to be any process that probes a 
 given quantum system to obtain information, we may also refer to this process as 
 a measurement in the computational basis when focussing on quantum information 
@@ -278,30 +394,6 @@ If measured in the standard basis we would expect the outcome to be $|k\rangle$
 state of the measurement gate to also be $|k\rangle$, resulting in the original 
 state $|\psi\rangle$ to be irreversibly lost. We can refer to the process the state 
 undergoes as a collapse of state. 
-
-
-\subsection{Weak Measurements}
-
-Consider an arbitrary system observable A. Assume a probe $[\hat{q}.\hat{p}] = i$
-in a minimum uncertainty state, defined by $\sigma^{in}_p$,$\bar{p}^{in}$, and 
-$\bar{q}^{in}=0$. We can then assume a Von Neumann type interaction between the 
-observable of interest and the position of the particle, consequence being the 
-probe receiving a momentum kick when it interacts with the system and that the 
-change in the momentum is exactly equal to the observable to be measured, $\hat{A}$.
-Formally, we can assume $\hat{H} = \delta(t)\hat{A}\otimes \hat{q}$, so that 
-$\hat{p}^t - \hat{p}^{in} = \hat{A}$ 
-Mathematically, we can define $\hat{A}(p^t) = p^t-p^{in}$ to be the estimate we 
-get for $A$ from measuring probe $\bar{p}^t$. Then for initial system state $|\psi^{in}\rangle$, 
-$E[\psi_{in}|A(p^t)|\psi^{in}]=\langle\psi_{in}|\hat{A}|\psi^{in}\rangle$.\\
-Now consider a final projective measurement on the system too, considering the 
-sub-ensemble where the system is found in state $|\phi^t\rangle$. Then we can consider 
-the post-selected average $E[A(p^t)|\psi^{in},\phi^{t}]$.
-In the weak measurement limit, $\sigma_p\rightarrow\infty$ we get the expectation value for the estimate 
-of the observable A given by: 
-
-$$E[A(p^t)|\psi^{in},\phi^t]\rightarrow Re\frac{\langle\phi^y|\hat{A}|\psi^{in}\rangle}{\langle\phi^t|\psi^t\rangle}$$
-The amount of disturbance to any system operator due to the coupling of the probe is very small. 
-
 
 
 \subsection{Quantum Circuit Born Machine}
@@ -330,6 +422,106 @@ The QCBM takes a $n \times m$ matrix of parameters in the range $(-\pi, \pi)$ as
 input, in the form of a dictionary. Each angle takes one of $2^k$ discrete values, 
 where $k$ is a model parameter. The resulting space therefore spans to: 
 $(2^m)^{n\cdot m}$
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.5]{qcbm1.png}
+    \caption{QCBM architecture}
+\end{figure}
+\subsubsection{Testing}
+Many methods were explored to generate time-series data from the QCBM as well as 
+testing parameters of the model. The first idea explored involved learning the 
+distribution of the delta value of an American option.
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.24]{QCBM-delta.png}
+    \caption{Quantile plot for American option delta}
+\end{figure}
+\\
+Given the delta of an option through a day, the QCBM demonstrated high
+generalisation power as shown by the diagonal nature of the plot. A genetic 
+algorithm was employed to learn the set of parameters $\theta$.\\
+The circuit also provided promising returns when learning the vega of the same 
+option. 
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.75]{QCBM-vega.png}
+    \caption{Quantile plot for American option vega}
+\end{figure}
+\\
+It was also important to verify the generalisation by learning the strike price,
+which was a constant for the option. We can observe the two histograms of the 
+samples generated from measurement.
+\begin{figure}[h]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[scale=0.6]{QCBM-strike1.png}
+        \caption{Histogram of training data}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[scale=0.6]{QCBM-strike2.png}
+        \caption{Histogram of samples observed}
+    \end{subfigure}
+    \caption{Comparison of training data and observed samples}
+    \label{fig:comparison}
+\end{figure}
+
+\subsection{Quantum Feature Maps}
+Another method for encoding time within quantum circuits was through the use of 
+quantum feature maps. We can define this to be $\phi : X \rightarrow F$ where $F$
+is a Hilbert space. This map transforms $x \rightarrow |\phi(x)\rangle$ by way 
+of $U_\phi(x)$. 
+\\ 
+Here we have two parts, the latent variable and time encoding. The latent variable 
+is a random, uniform $z \in [0,1] $. This is encoded through the use of $R_x(\theta)$ where 
+\begin{equation}
+R_x(\theta) = 
+\begin{bmatrix}
+\cos(\theta/2) & -i\sin(\theta/2) \\
+-i\sin(\theta/2) & \cos(\theta/2)
+\end{bmatrix}
+\end{equation}
+Time in encoded through the use of $R_y(\theta)$ where 
+\begin{equation}
+R_y(\theta) = 
+\begin{bmatrix}
+\cos(\theta/2) & -\sin(\theta/2) \\
+\sin(\theta/2) & \cos(\theta/2)
+\end{bmatrix}
+\end{equation}
+It goes that by learning the quantile function of a SDE, we can evaluate it at 
+random uniform $z$'s as $t$ progresses to give a full time-series that obeys the 
+SDE. To do so we require a circuit that maps $z$ to a sample $G(z) = Q(z)$. \\ 
+I have taken the example of the Ornstein-Uhlenbeck process to provide a proof of 
+concept. We can define OU to be: 
+\begin{equation}
+  dX_t = \theta (\mu - X_t) \, dt + \sigma \, dW_t 
+\end{equation}
+where $\theta$ is the mean reversion, $\mu$ is the long-term mean, $\sigma$ is the 
+volatility, and $W_t$ is the Weiner process. 
+\\
+By way of Fokker-Plank we can get the following for the quantile function:
+\begin{equation}
+  \frac{\partial Q(z,t)}{\partial t} = f(Q,t) - \frac{1}{2}\frac{\partial g^2(Q,t)}
+{\partial Q} + \frac{g^2(Q,t)}{2}(\frac{\partial Q}{\partial z})^{-2}
+  \frac{\partial ^2Q}{\partial z^2}
+\end{equation}
+where $f(Q,t)$ is the drift term and $g(Q,t)$ is the diffusion term. 
+\\ 
+Using this, I was able to run some preliminary tests, gaining the following results:
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.75]{Quantile1.png}
+    \caption{Sampling learnt QF for the OU process}
+\end{figure}
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.75]{Quantile2.png}
+    \caption{Sampling learnt QF with higher circuit depth}
+\end{figure}
+
 \subsubsection{Barren Plateau}
 A point of concern when searching for the optimal set of $\theta s$ is the exploration 
 of the large space, here we may observe issues such as barren plateau(BP). BP 
@@ -337,31 +529,42 @@ insists that the gradient of the parameters of a given PQC will vanish exponenti
 w.r.t the search space. A formal proof can be found in [barren plateau reference]. 
 \\ 
 I will aim to explore using gradient-based methods as well as alternatives such 
-as genetic algorithms
-\section{Quantum Architectures}
-\subsection{Butterfly}
-\subsection{Brick}
-\subsection{Pyramid}
-
-
-\section{Design}
+as genetic algorithms. 
 
 
 \clearpage 
 \section{Planning}
+The high level Gantt Chart can be seen in the following figure:
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.75]{GanttChart.png}
+    \caption{Gantt Chart}
+\end{figure}
+\\I have chosen to split the development into 4 sprints, each one with a separate
+purpose. 
+\subsection{Sprint 1}
+\subsection{Sprint 2}
+\subsection{Sprint 3}
+\subsection{Sprint 4}
+
+
 
 \clearpage
 \section{Risk Assessment}
+%\renewcommand{\arraystretch}{1} % Increase row height for better readability
+%\setlength{\extrarowheight}{2pt}
 
-
+\begin{tabularx}{\textwidth}{|p{2.2cm}|p{2.1cm}|p{1.5cm}|p{1.9cm}|X|}
+\hline
+\textbf{Risk} & \textbf{Probability (1-5)} & \textbf{Severity (1-5)} & \textbf{Risk Exposure (P x S)} & \textbf{Mitigation} \\ \hline
+Quantum simulator packages become unavailable & 1.5 & 5 & 7.5 & There are 3 major providers of quantum simulation software: Amazon, Google, and IBM. If one were to become unavailable, I would be able to transfer the quantum circuits to a different provider. \\ \hline
+Data becomes unavailable & 1 & 3 & 3 & There are many providers of data for the SX5E and samples have already been downloaded onto a local device. In the worst case, I would be able to run the same code with a different asset. \\ \hline
+Illness & 4 & 3 & 12 & All deadlines will be soft deadlines with at least a week of spare time before any hard deadlines. Therefore, hard deadlines will still be met. \\ \hline
+Time management issues & 3 & 4 & 12 & The use of time management tools such as Gantt should avoid this. \\ \hline
+Project is rendered not possible due to a recent publication & 1 & 5 & 5 & There are many ways to pivot in this project, such as using a different quantum technique. \\ \hline
+Device failure & 3 & 5 & 15 & GitHub will be used for source control. \\ \hline
+\end{tabularx}
 \clearpage
-\section{Bibliography}
-To sort out later:\\
-Born machine: https://link.springer.com/article/10.1007/s42484-022-00063-3
-\\
-Stateprep1: https://arxiv.org/pdf/2201.11495
-\\
-Stateprep2: https://arxiv.org/pdf/2108.06150
 
 \printbibliography
 
