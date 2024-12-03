@@ -10,6 +10,7 @@
 \usepackage{pgfgantt}
 \usepackage{subcaption}
 \usepackage{tabularx}
+\usepackage{pdfpages}
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5
 \definecolor{mauve}{rgb}{0.58,0,0.82}
@@ -109,7 +110,8 @@ recently observed non-parametric models that harness neural networks and machine
 learning which aim to demonstrate high accuracy on out-of-sample forecasts.
 \\
 In the deep hedging framework, we are able to construct a dynamic optimal hedging 
-policy by following market simulations to maturity. This is a policy that involves 
+policy by following realistic market simulations to maturity. This is a policy 
+that involves 
 a mapping from market states to actions. Instead of solving analytical equations 
 under unrealistic market assumptions, such as Greek hedging, we can instead model
 the trading decisions made as an optimisation problem, particularly suitable for 
@@ -145,9 +147,17 @@ solve for an optimal value function, a move towards searching for a global
 maximum instead of thinking about local risk management.\autocite{deep bellman}
 \\
 In recent times, we have also seen research done on using quantum computing to 
-hedge portfolios, here the 
-authors presented a quantum reinforcement learning method based on policy-search 
-and distributional actor-critic algorithms. The authors  \autocite{quantum deep hedging}
+hedge portfolios, here the authors presented a quantum reinforcement learning 
+method based on policy-search and distributional actor-critic algorithms. 
+They proposed using a Quantum Neural Network(QNN) to approximate the value of a 
+given value function by predicting the expected utility of returns. They constructed 
+this using compound and orthogonal layers which were built using Hamming-weight
+unitaries. This helped overcome the barren plateau by ensuring the gradient 
+variance does not vanish exponentially with qubit count. Another method was also 
+proposed by modeling the entire distribution of returns rather than just the 
+expectation. By exploiting the power of parameterised circuits, the categorical 
+distribution was learnt enabling it to capture variability and tail risk. 
+\autocite{quantum deep hedging}
 \\
 There is an immense amount of research being done on exploiting the benefits of 
 quantum computing, recent advancements being in quantum algorithms. 
@@ -155,18 +165,19 @@ These claim to provide exponential speed-up over classical
 methods, though in reality we see great complexity in state preparation, requiring 
 $\Theta(2^n/n)$ circuit depth with n qubits or $\Theta(n)$ circuit depth with 
 $\Theta(2^n)$ ancillary qubits. Here we see hybrid models such as Born machines
-and Quantum generative adversarial networks boasting high generalisation ability. 
+and Quantum generative adversarial networks boasting high generalisation ability.
+\autocite{do quantum circuits generalise}
 \\
-There has also been research in harnessing quantum weak measurements to enhance 
-the ability of quantum machine learning algorithms. In quantum reservoir computing,
+There has also been research in harnessing back action from quantum weak 
+measurements to enhance the ability of quantum machine learning algorithms. 
+In quantum reservoir computing,
 the ability to retain information from past inputs plays a key role in processing 
 temporal series and producing future predictions.\autocite{fujii_quantum_2020}  
 \\
 This research aims to combine the needs of financial firms in hedging portfolios
 using realistic market models by utilising QCBMs as a tool 
 for simulating paths in combination with quantum neural networks for learning 
-optimal policies. A comparison will be made against simulating the underlying with 
-classical methods. 
+optimal policies. A comparison will be made against hedging under Black-Scholes.
 
 
 \clearpage
@@ -287,9 +298,11 @@ These aim to minimise the tail-risk involved in a given trading strategy hence
 creating a more robust strategy and conforming to regulations such as Basel III.
 \cite{The New International Regulation of Market Risk}
 \\
-
-SIMULATING MARKETS TO MATURITY PARAGRAPH
-
+One of the main problems is the scarcity of data, calibration of such models 
+requires huge amounts of realistic market data for the underlying. Hence this
+requires a market generator. Traditionally a GBM with Monte Carlo simulations 
+would be used but this paper goes beyond, using quantum computing to combat the 
+aforementioned issues. 
 \\
 The design of the neural network responsible would involve an input layer which
 takes the market state such as the underlying, and options features such as the 
@@ -531,39 +544,36 @@ w.r.t the search space. A formal proof can be found in [barren plateau reference
 I will aim to explore using gradient-based methods as well as alternatives such 
 as genetic algorithms. 
 
+\subsection{Design}
+Below is the rough proposed high level design with a few components. The market 
+simulation of the underlying will feed into the deep hedger. The trained model 
+will then be compared to a simple Greeks-based hedger on a GBM underlying.
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=0.65,width=\textwidth]{pipeline.png}
+    \caption{Proposed high-level design}
+\end{figure}
 
 \clearpage 
 \section{Planning}
-The high level Gantt Chart can be seen in the following figure:
-\begin{figure}[h]
-    \centering
-    \includegraphics[scale=0.75]{GanttChart.png}
-    \caption{Gantt Chart}
+The high level Gantt Chart can be seen in the following figure. I have chosen 
+to split the development into 6 sections, each one with a separate purpose.
+\begin{figure}[htp]
+\includegraphics[page=1,width=\textwidth,scale=1.4]{GanttChart.pdf}
 \end{figure}
-\\I have chosen to split the development into 4 sprints, each one with a separate
-purpose. 
-\subsection{Sprint 1}
-\subsection{Sprint 2}
-\subsection{Sprint 3}
-\subsection{Sprint 4}
 
 
 
 \clearpage
 \section{Risk Assessment}
-%\renewcommand{\arraystretch}{1} % Increase row height for better readability
-%\setlength{\extrarowheight}{2pt}
+A risk assessment, though pedestrian, is included to be holistic.\\
 
-\begin{tabularx}{\textwidth}{|p{2.2cm}|p{2.1cm}|p{1.5cm}|p{1.9cm}|X|}
-\hline
-\textbf{Risk} & \textbf{Probability (1-5)} & \textbf{Severity (1-5)} & \textbf{Risk Exposure (P x S)} & \textbf{Mitigation} \\ \hline
-Quantum simulator packages become unavailable & 1.5 & 5 & 7.5 & There are 3 major providers of quantum simulation software: Amazon, Google, and IBM. If one were to become unavailable, I would be able to transfer the quantum circuits to a different provider. \\ \hline
-Data becomes unavailable & 1 & 3 & 3 & There are many providers of data for the SX5E and samples have already been downloaded onto a local device. In the worst case, I would be able to run the same code with a different asset. \\ \hline
-Illness & 4 & 3 & 12 & All deadlines will be soft deadlines with at least a week of spare time before any hard deadlines. Therefore, hard deadlines will still be met. \\ \hline
-Time management issues & 3 & 4 & 12 & The use of time management tools such as Gantt should avoid this. \\ \hline
-Project is rendered not possible due to a recent publication & 1 & 5 & 5 & There are many ways to pivot in this project, such as using a different quantum technique. \\ \hline
-Device failure & 3 & 5 & 15 & GitHub will be used for source control. \\ \hline
-\end{tabularx}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[scale=1]{RiskAssess.png}
+\end{figure}
+
 \clearpage
 
 \printbibliography
