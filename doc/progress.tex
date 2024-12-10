@@ -65,21 +65,22 @@
 
 %TC:endignore
 
-\author{Soham Deshpande\\ Dr. Srinandan Dasmahapatra}
+\author{Soham Deshpande\\ Supervisor: Dr. Srinandan Dasmahapatra}
 \date{October 2024}
 
 \begin{document}
 
 \maketitle
+\vspace{10cm}
+A project progress report submitted for the award of MEng Computer Science
 \thispagestyle{empty}
 
 %TC:ignore
-\detailtexcount{progress}
+%\detailtexcount{progress}
 %TC:endignore
 
 
 
-\clearpage
 
 
 
@@ -103,10 +104,12 @@ this research will contribute to the growing literature on risk management in
 quantitative finance, with applications of the market generator extending beyond 
 deep hedging. 
 \end{abstract}
-%TC:endignore
+
 \clearpage
 
+
 \tableofcontents
+%TC:endignore
 \clearpage
 
 
@@ -123,7 +126,7 @@ practice, we experience incomplete markets due to frictions. In recent years
 markets have experienced periods of heightened volatility, much that disobey 
 traditional frameworks. This generates the need for complex, realistic market 
 models that can account for these.\\ 
-Traditional methods of pricing options has shown to be ineffective for equity 
+Traditional methods of hedging options has shown to be ineffective for equity 
 markets, new information resulting in rapid changes. Much of the available 
 literature models the market as a smooth, continuous stochastic process within 
 a Gaussian space. Such models are sufficient for common market activity but fail 
@@ -164,37 +167,37 @@ proposed a market model for path generation of options but this still
 employed risk-neutral diffusion\autocite{schweizer_arbitrage-free_2008}. Wiese then introduced 
 a new dimension by using GANs to convert options into 
 local volatility models with simpler no-arbitrage constraints. This focussed 
-on the local stochastic nature of options.
-\autocite{choudhary_funvol_2023,wiese_deep_2019,wiese_multi-asset_2021}
+on the local stochastic nature of options
+\autocite{choudhary_funvol_2023,wiese_deep_2019,wiese_multi-asset_2021}.
 Some approaches suggest using actor-critic reinforcement learning algorithms to 
 solve for an optimal value function, a move towards searching for a global
-maximum over local risk management.
-\autocite{buehler_deep_2022,movahed_introducing_2024}
+maximum over local risk management
+\autocite{buehler_deep_2022,movahed_introducing_2024}.
 \\
 Recent research explores using quantum computing to 
 hedge portfolios, here the authors presented a quantum reinforcement learning 
 method based on policy-search and distributional actor-critic algorithms. 
 They proposed using a Quantum Neural Network to approximate the value of a 
 given value function by predicting the expected utility of returns using compound and orthogonal layers which were built using Hamming-weight
-unitaries.\autocite{kerenidis_classical_2022} This helped overcome the barren plateau by ensuring the gradient 
-variance does not vanish exponentially with qubit count. Another method models the entire return distribution, leveraging parameterised circuits to learn categorical distributions and capture variability and tail risk. 
-\autocite{cherrat_quantum_2023,dasgupta_loading_2022}
+unitaries\autocite{kerenidis_classical_2022}. This helped overcome the barren plateau by ensuring the gradient 
+variance does not vanish exponentially with qubit count. Another method models the entire return distribution, leveraging parameterised circuits to learn categorical distributions and capture variability and tail risk 
+\autocite{cherrat_quantum_2023,dasgupta_loading_2022}.
 \\
 There is an immense amount of research being done on exploiting the benefits of 
 quantum computing, recent advancements being in quantum algorithms. 
 These claim to provide exponential speed-up over classical 
 methods, though in reality, we see great complexity in state preparation, requiring 
 $\Theta(2^n/n)$ circuit depth with n qubits or $\Theta(n)$ circuit depth with 
-$\Theta(2^n)$ ancillary qubits.\autocite{zhang_quantum_2022} Here we see hybrid models such as Born machines
-and Quantum generative adversarial networks boasting high generalisation ability.
-\autocite{ganguly_implementing_nodate,gili_2022_do,horowitz_quantum_2022}
+$\Theta(2^n)$ ancillary qubits\autocite{zhang_quantum_2022}. Here we see hybrid models such as Born machines
+and Quantum generative adversarial networks boasting high generalisation ability
+\autocite{ganguly_implementing_nodate,gili_2022_do,horowitz_quantum_2022}.
 \\
 There has also been research in harnessing back action from quantum weak 
 measurements to enhance the ability of quantum machine learning algorithms. 
 In quantum reservoir computing,
 the ability to retain information from past inputs plays a key role in processing 
-temporal series and producing future predictions.
-\autocite{franceschetto_harnessing_2024,fujii_quantum_2020,garcia-beni_squeezing_2024,mujal_time-series_2023}  
+temporal series and producing future predictions
+\autocite{franceschetto_harnessing_2024,fujii_quantum_2020,garcia-beni_squeezing_2024,mujal_time-series_2023}.
 \\
 This research aims to combine the needs of financial firms in hedging portfolios
 using realistic market models by utilising QCBMs as a tool 
@@ -211,7 +214,7 @@ later chapters. \\
 \subsection{Market}
 Consider a market with a finite time horizon $T$ defined on the probability space 
 ($\Omega,\mathcal{F},P$) along with a filtration $\bold{F} = \{\mathcal{F}| 0 \leq t \leq T \}$ 
-This can be thought of as an adapted (n+1) dimensional It$\hat{o}$ process 
+This can be thought of as an adapted (n+1) dimensional It\^{o} process 
 $X(t) = (X_0(t), X_1(t),...,X_n(t))$
 which has the form 
 \begin{equation}
@@ -274,14 +277,14 @@ In this research I will be focussing on a single asset, the Euro Stoxx 50 Index
 (SX5E) and relevant derivatives. This is a stock index of 50 stocks in the Eurozone. 
 This index captures around 60\% of the free-float market capitalisation of the 
 Euro Stoxx Total Market Index which covers about 95\% of the free-float market 
-in the Eurozone.\autocite{a2021_euro} Rationale behind choosing this index is the availability of data,
+in the Eurozone\autocite{a2021_euro}. Rationale behind choosing this index is the availability of data,
 options traded with SX5E as the underlying and the liquidity of the index.
 \\
 Derivatives that are held in the portfolio to be hedged will include those that 
 have SX5E as the underlying, examples are weekly, monthly, and quarterly
 expiration options. These are European-style so can only be exercised upon 
-maturity. Data can be found on Bloomberg\autocite{bloomberg_2023_bloomberg} and Refinitiv.
-\autocite{lseg} 
+maturity. Data can be found on Bloomberg\autocite{bloomberg_2023_bloomberg} and Refinitiv
+\autocite{lseg}.
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.35]{sx5e.png}
@@ -316,10 +319,18 @@ expected return of
 $T^\pi_t = (R^\pi_{t+1} - C^\pi_{t+1} )+ ... +(R^\pi_T - C^\pi_T)$.
 The goal of the reinforcement algorithm would be to maximise the expected return. 
 However, to create a strategy that does not incur too much risk, it is important 
-to include metrics such as Value at Risk (VaR) and Conditional Value at Risk(CVAR).
+to include metrics such as Value at Risk (VaR) and Conditional Value at Risk(CVAR)
+where
+\begin{equation}
+\text{VaR}_{\alpha}(X) = \inf \{x \in \mathbb{R} : P(X \leq x) \geq \alpha \}
+\end{equation}
+and likewise,
+\begin{equation}
+\text{CVaR}_{\alpha}(X) = \frac{1}{1 - \alpha} \int_{-\infty}^{\text{VaR}_{\alpha}(X)} x \cdot\, p(x) \, dx
+\end{equation}
 These aim to minimise the tail-risk involved in a given trading strategy hence 
-creating a more robust strategy and conforming to regulations such as Basel III.
-\cite{saissihassani_2021_the}
+creating a more robust strategy and conforming to regulations such as Basel III
+\cite{saissihassani_2021_the}.
 \\
 One of the main problems is the scarcity of data, calibration of such models 
 requires huge amounts of realistic market data for the underlying. Hence this
@@ -332,19 +343,11 @@ takes the market state such as the underlying, and options features such as the
 strike price and maturity.\\
 The loss function will have
 type: $\text{Loss }=\lambda_1\cdot\mathcal{L}_R + \lambda_2 \cdot \mathcal{L}_{CVaR}$
-where $\lambda_i$ is used to define a weighting to the two losses, $\mathcal{L}_R$ 
+where $\lambda_i$ is the weighting of the two losses, $\mathcal{L}_R$ 
 is the replication loss from simulating the options to maturity given a generator. 
 We can define it as $\mathcal{L}_R(X^\alpha_T-g(S_t))$ where $X^\alpha_T$ is the 
-portfolio at maturity and $g(S_t)$ is the option pay-off.\\
-VaR can be defined as :
-\begin{equation}
-\text{VaR}_{\alpha}(X) = \inf \{x \in \mathbb{R} : P(X \leq x) \geq \alpha \}
-\end{equation}
-CVaR likewise: 
-\begin{equation}
-\text{CVaR}_{\alpha}(X) = \frac{1}{1 - \alpha} \int_{-\infty}^{\text{VaR}_{\alpha}(X)} x \cdot\, p(x) \, dx
-\end{equation}
-
+portfolio at maturity and $g(S_t)$ is the option pay-off.
+\\
 This takes a global approach towards finding an optimal policy instead of 
 managing a local criterion as suggested by \cite{fecamp_deep_2021}.
 
@@ -355,7 +358,10 @@ managing a local criterion as suggested by \cite{fecamp_deep_2021}.
 An essential part of quantum computing involves the existence of the Born
 Rule. Born's measurement rule states that:
 \begin{equation}
-p(x) = |\langle x|\psi(\theta)|\rangle|^2
+p(x) = |\langle x|\psi(\theta)\rangle|^2
+\end{equation} where 
+\begin{equation}
+|\psi(\theta)\rangle = U(\theta)|0\rangle^{\otimes n}
 \end{equation}
 The state $|\psi(\theta)\rangle$ is generated by evolving state $|0\rangle$
 according to a Hamiltonian $H$ that is constructed from gates. Once combined, the 
@@ -367,14 +373,11 @@ By taking the distribution associated to the state, $|\psi(\theta)\rangle$ we ca
 treat the PQC as a generative model, upon measurement will 
 generate samples of a target distribution $\chi$. This model is parameterised 
 by $\theta$, which defines a quantum circuit $U(\theta)$ made up of a set of quantum 
-gates such that:
-\begin{equation}
-|\psi(\theta)\rangle = U(\theta)|0\rangle^{\otimes n}
-\end{equation}
+gates.
 By measuring the circuit, we can obtain samples. Producing samples that emulate 
 the target distribution involves minimising the parameters of the circuit $U(\theta)$, 
-a process once convergence is reached, will generate accurate samples. 
-\cite{liu_differentiable_2018}
+a process once convergence is reached, will generate accurate samples 
+\cite{liu_differentiable_2018}.
 
 \subsection{State Preparation}
 We require state preparation to transfer the classical data onto the 
@@ -385,8 +388,8 @@ high information density and low error rates; main methods include: basis, ampli
 Without the use of ancillary qubits, we can expect an exponential circuit depth
 to prepare an arbitrary quantum state. Using them we can reduce the depth to be 
 sub-exponential scaling, with recent advancements reaching $\Theta(n)$ given $O(n^2)$
-ancillary qubits.
-\cite{shaib_efficient_2023,zhang_quantum_2022}
+ancillary qubits
+\cite{shaib_efficient_2023,zhang_quantum_2022}.
 
 
 \subsubsection{Amplitude Encoding}
@@ -450,7 +453,7 @@ original data.
 The QCBM takes a $n \times m$ matrix of parameters in the range $(-\pi, \pi)$ as 
 input, in the form of a dictionary. Each angle takes one of $2^k$ discrete values, 
 where $k$ is a model parameter. The resulting space therefore spans to: 
-$(2^m)^{n\cdot m}$
+$(2^m)^{n\cdot m}$.
 \clearpage
 \subsubsection{Testing}
 Many methods were explored to generate time-series data from the QCBM as well as 
@@ -498,20 +501,20 @@ quantum feature maps. We can define this to be $\phi : X \rightarrow F$ where $F
 is a Hilbert space. This map transforms $x \rightarrow |\phi(x)\rangle$ by  $U_\phi(x)$\autocite{paine_quantum_2023,steinbrecher_quantile_2008,vlasic_quantum_2024} .
 \\ 
 Here we have two parts, the latent variable and time encoding. The latent variable 
-is a random, uniform $z \in [0,1] $. This is encoded through the use of $R_x(\theta)$ where 
+is a random, uniform $z \in [0,1] $. This is encoded through the use of $R_x(\phi)$ where 
 \begin{equation}
-R_x(\theta) = 
+R_x(\phi) = 
 \begin{bmatrix}
-\cos(\theta/2) & -i\sin(\theta/2) \\
--i\sin(\theta/2) & \cos(\theta/2)
+\cos(\phi/2) & -i\sin(\phi/2) \\
+-i\sin(\phi/2) & \cos(\phi/2)
 \end{bmatrix}
 \end{equation}
-Time in encoded through the use of $R_y(\theta)$ where 
+Time in encoded through the use of $R_y(\phi')$ where 
 \begin{equation}
-R_y(\theta) = 
+R_y(\phi') = 
 \begin{bmatrix}
-\cos(\theta/2) & -\sin(\theta/2) \\
-\sin(\theta/2) & \cos(\theta/2)
+\cos(\phi'/2) & -\sin(\phi'/2) \\
+\sin(\phi'/2) & \cos(\phi'/2)
 \end{bmatrix}
 \end{equation}
 It goes that by learning the quantile function of a SDE, we can evaluate it at 
@@ -531,13 +534,42 @@ By way of Fokker-Plank, we can get the following for the quantile function:
 {\partial Q} + \frac{g^2(Q,t)}{2}(\frac{\partial Q}{\partial z})^{-2}
   \frac{\partial ^2Q}{\partial z^2}
 \end{equation}
-where $f(Q,t)$ is the drift term and $g(Q,t)$ is the diffusion term. 
+where $f(Q,t)$ is the drift term and $g(Q,t)$ is the diffusion term.
+Training the quantum circuit requires a dataset generated from the probability 
+distribution for the market, here represented by the OU process. We have to assume
+the underlying SDE generates data similar to the observed data points. The loss 
+function would included two parts: $\mathcal{L} = \mathcal{L}_{Data} + 
+\mathcal{L}_{SDE}$. This ensures the distribution learnt conforms to a given 
+known process whilst replicating dynamics observed in real life. This technique 
+shines in a context where data is sparse. In this paper, I will aim to test the 
+market generator using the OU process as well as a Merton Jump Diffusion model.
 \begin{figure}[ht!]
     \centering
-    \includegraphics[scale=0.40]{qf.png}
-    \caption{Quantile Function for time-series}
+    \includegraphics[scale=0.45]{qfc.png}
+    \caption{PQC for representing a time-dependent quantile function }
 \end{figure}
-\\Using this, I was able to run some preliminary tests.
+
+\begin{figure}[ht!]
+    \centering
+    \includegraphics[scale=0.35]{qf.png}
+    \caption{Quantile Function process for time-series with data}
+\end{figure}
+\subsubsection{Merton Jump Diffusion Model}
+The MJD model is an exponential L\'{e}vy model of the form 
+\begin{equation}
+  S_t = S_0e^{\mathcal{L}_t}
+\end{equation}
+where the stock price process is modelled as an exponential of a L\'{e}vy process. 
+We can also define $\mathcal{L}_t$ to be 
+\begin{equation}
+  \mathcal{L}_t = (\alpha - \frac{\sigma^2}{2}-\lambda k)t + \sigma B_t + 
+  \sum^{N_t}_{i=1}Y_i
+\end{equation}
+where the first term is a Brownian motion with drift and the latter is a 
+compound Poisson jump process. 
+\clearpage
+\subsubsection{Testing}
+Using this, I was able to run some preliminary tests.
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.7]{Quantile1.png}
@@ -549,7 +581,6 @@ where $f(Q,t)$ is the drift term and $g(Q,t)$ is the diffusion term.
     \caption{Sampling learnt QF with higher circuit depth}
 \end{figure}
 
-\clearpage
 \subsubsection{Barren Plateau}
 A point of concern when searching for the optimal set of $\theta s$ is the large search space, here we may observe issues such as barren plateau(BP). BP 
 insists that the gradient of the parameters of a given PQC will vanish exponentially 
@@ -569,11 +600,11 @@ will then be compared to a simple Greeks-based hedger on a GBM underlying.
 
 \clearpage 
 \section{Planning}
-Since this project is a one-person research project, there isn't a focus on team 
+Since this project is a solo research project, there isn't a focus on team 
 management, however, increases the work required making 
 time management crucial. The greatest risk identified in this project is the 
 lack of convergence on a final solution as this is an emerging field with research 
-being published constantly. To avoid this a Gantt chart has been designed to 
+being published constantly. To avoid this, a Gantt chart has been designed to 
 motivate progress; this can be seen in the following figure.
 \begin{figure}[htp]
 \includegraphics[page=1,width=\textwidth,scale=1.4]{GanttChart.pdf}
@@ -586,7 +617,7 @@ any setbacks that may have occurred. The client can be any banks I have the
 pleasure of talking to. They can give criticism on techniques used, assumptions 
 made and usefulness. I have also tried to split the project into 4 main sprints,
 Data Collection, Market Simulation, Deep Hedging, and Results. They range from 
-2-4 weeks dependant on the difficulty of the task at hand. The Kanban framework 
+2-4 weeks dependent on the difficulty of the task at hand. The Kanban framework 
 will be used for each sprint to identify and monitor tasks that need to be done. 
 An example for Sprint 1 can be found in the appendix. A requirements table can 
 also be found.
