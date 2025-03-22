@@ -75,14 +75,17 @@
 
 %TC:endignore
 
-\author{Soham Deshpande\\ Supervisor: Dr. Srinandan Dasmahapatra}
+\author{Soham Deshpande\\Supervisor: Dr. Srinandan Dasmahapatra
+\\Second Supervisor: Dr. Hansung Kim}
 \date{April 2025}
 
 \begin{document}
 
 \maketitle
 \vspace{10cm}
+\begin{centering}
 A project report submitted for the award of MEng Computer Science
+\end{centering}
 \thispagestyle{empty}
 
 %TC:ignore
@@ -102,14 +105,21 @@ A project report submitted for the award of MEng Computer Science
 \begin{abstract}
 Parameterised Quantum Circuits (PQCs) have opened many doors, one 
 such being the use in financial markets. In this paper, I look at the problem 
-of optimally hedging a portfolio of derivatives through the use of quantum computing. 
-Given a Quantum Circuit Born Machine (QCBM), we are able to generate synthetic 
-data that mimics the statistical distribution of the original dataset. 
-We are generating synthetic market data, here the dynamics of a 
-given vanilla option's underlying is learnt. The market generator is then used to simulate the 
-underlying to maturity with the intent of learning an optimal hedging strategy $\pi^*$, a 
-showcase of a data-driven approach to risk hedging. Different generator architectures
-will be compared to maximise the quality of the synthetic data. The findings of 
+of developing an accurate market generator through the use of quantum computing
+for the purposes of hedging. 
+Given a Quantum Circuit Born Machine (QCBM), we are able to exploit the high 
+expressibility to generate synthetic 
+data that mimics the statistical distribution of the original dataset. The market 
+generator is then used to simulate an 
+underlying asset to maturity with the intent of learning an optimal hedging strategy 
+$\pi^*$, a showcase of a data-driven approach to hedging exposure. I show that 
+the synthetic 
+data produced by this method has shown to capture the fat tails of the market 
+better than classical methods, as well as demonstrating superiority in 
+out-of-sample testing with COVID data. Different generator 
+architectures have been compared to maximise the quality of the synthetic data 
+and avoid issues with barren plateaus. 
+The findings of 
 this research will contribute to the growing literature on risk management in 
 quantitative finance, with applications of the market generator extending beyond 
 deep hedging. 
@@ -159,9 +169,14 @@ distributions and relationships.
 \newp
 In this research, I aim to tackle the problem 
 of generating synthetic financial data, addressing issues that come about from 
-using a classical method. Through comparisons between traditional approaches, 
+using a classical method particularly the estimation of tail risk and skewness. 
+Through comparisons between traditional approaches, 
 I aim to demonstrate an advantage in the expressibility of Quantum Circuit Born 
-Machines (QCBMs). There will also be an exploration into the variety of architectures 
+Machines (QCBMs); these will be described quantitatively using measures such as 
+Value at Risk (VaR) and Conditional Value at Risk (CVaR). By performing out-of-sample 
+tests on COVID and Oil data, I aim to highlight the weaknesses of traditional models 
+and showcase a quantum superiority.
+There will also be an exploration into the variety of architectures 
 available for the QCBM, evaluating different ansatz designs. Where unusual behaviours
 due to quantum physics occur, such as barren plateau, I will explore in greater detail 
 as well as any circuit optimisation techniques that may present themselves as 
@@ -180,7 +195,18 @@ project with more detailed explanations being left for their respective sections
 \newp 
 Market data, though appearing entirely stochastic at first glance, contains many 
 hidden patterns and relationships. Classical methods such as Black-Scholes  
-\autocite{blackscholes} 
+\autocite{blackscholes} have been proposed to capture some of this behaviour, 
+though built on unrealistic assumptions, these govern 
+our fundamental understanding of quantitative finance. With the move to the new era 
+of electronic trading, the need for more complex markets models became more present.
+Being able to trade within nanoseconds presented traders with a new, human-free method 
+of trading, moving to a purely mathematical approach. In this approach we strive
+for optimal strategies to make money, taking calculated positions and limiting 
+exposure to large market movements. It is here where traditional methods started 
+to be insufficient; particua
+\clearpage 
+
+
 \section{Related Literature}
 To place this research within the context of existing literature, we can split 
 the project into 2 components: the market generator, and 
@@ -315,7 +341,8 @@ P_T = max(0,K-S_T)
 
 
 \subsection{Market Data}
-In this research I will be focussing on hedging a single asset. 
+In this research I will be focussing on hedging a portfolio consisting of a single 
+asset, hence requiring a simulation of a single underlying.
 \subsubsection{Euro Stoxx 50}
 The Euro Stoxx 50 Index (SX5E) and relevant derivatives. This is a stock index of 50 stocks in the Eurozone. 
 This index captures around 60\% of the free-float market capitalisation of the 
@@ -344,12 +371,10 @@ movements.
 My model of choice for comparison is the Merton-Jump Diffusion model, this an 
 elementary model that goes beyond Black-Scholes by trying to capture the negative
 skewness and excess kurtosis of log price returns. This is done through the 
-addition of a compound Poisson jump process. This aimed to represent the jumps 
+addition of a compound Poisson jump process. This aims to represent the jumps 
 we observe in the market in a more realistic fashion rather than assuming constant 
 volatility assumption made by Black-Scholes. As a simplification, I will be referring 
 to Black-Scholes by BS and Merton-Jump Diffusion with MJD.
-
-
 \subsection{Model}
 A standard derivation of the model will allow us to explore its assumptions and 
 limitations. This model consists of two components, jump and diffusion. The 
@@ -386,17 +411,44 @@ unrealistic behaviour, most important being a lack of excess kurtosis.
 Markets 
 often exhibit fat tails, especially within commodities. One such event may 
 be the release of news from OPEC+, the organisation of petroleum-exporting 
-countries. In recent times, wars and conflict has become 
+countries. A restriction in oil production may cause the price of oil to jump 
+rapidly. In recent times, wars and conflict has also become 
 ever present, causing large movements in asset prices; therefore it is not 
 unrealistic to
 expect extreme price movements to be more frequent than can be modelled 
 by a Gaussian.
-\\
-We also may expect poor volatility clustering; constant volatility 
+\newp
+The MJD requires calibration of parameters before use, typically done using historical 
+data or implied volatility surfaces. Once calibrated these become assumptions of 
+the data and so do not change even if the market observations move away from it. 
+This would lead us to expect higher overfitting to the historical data, possibly 
+failing in unseen conditions such as the market's reaction to COVID. 
+\newp 
+We also may expect poor volatility clustering with the MJD; constant volatility 
 is not experienced by the market, instead periods of high volatility followed 
 by periods of low volatility is observed. Though this paper won't be focussing 
 on this phenomenon, it is important to consider.
-\\ 
+\subsection{Calibration}
+In this research, I have chosen to use maximum likelihood estimation to estimate 
+the parameters for the MJD model. In the analytical solution we require five 
+parameters: $\alpha$, $\sigma$, $\mu_j$, $\delta$, and $\lambda$. These are the 
+expected return, volatility of the given asset, expectation of the jump size, 
+standard deviation of the jump size and lastly the jump intensity. We can then 
+use MLE on the probability density of log returns $S_t = ln(\frac{S_t}{S_0})$ 
+\begin{equation}
+P(S_t) = \sum^\infty_{i=0} \frac{e^{-\lambda t}(\lambda t)^i}{i!}N(S_t;(\alpha - 
+\frac{\sigma^2}{2}-\lambda k)t+i\mu_j,\sigma^2t+i\delta^2)
+\end{equation}
+The likelihood function hence becomes 
+\begin{equation}
+  L(\theta;S) = \prod^T_{t=1}P(S_t)
+\end{equation}
+We can minimise the negative log-likelihood to obtain 
+\begin{equation}
+  -\ln L(\theta;S) = -\sum^T_{t=1}\ln P(S_t)
+\end{equation}
+Another popular option to calibrate the MJD model is by considering the implied 
+volatility surface of existing options.
 
 
 
@@ -404,12 +456,7 @@ on this phenomenon, it is important to consider.
 
 
 
-
-
-
-
-
-
+\clearpage
 
 \section{Parameterised Quantum Circuits}
 
