@@ -448,20 +448,97 @@ We can minimise the negative log-likelihood to obtain
   -\ln L(\theta;S) = -\sum^T_{t=1}\ln P(S_t)
 \end{equation}
 Another popular option to calibrate the MJD model is by considering the implied 
-volatility surface of existing options.
-
-
-
-
-
-
+volatility surface of existing options. This technique can lead to a 
+calibration but suffers with issues surrounding the sensitivity of the tails of 
+the asset prices. It is also well documented that given a function that measures 
+the calibration error, we can observe a largely flat landscape surrounding the 
+optimal solution, 
+implying obtaining accurate parameters can become very computationally 
+expensive, often requiring hundreds of iterations \autocite{jump05}. These difficulties
+can translate into a poor hedge, leaving a buyer overexposed to market fluctuations. 
 
 \clearpage
 
-\section{Parameterised Quantum Circuits}
-
-\subsection{Parameterised Circuits}
-Consider a set of unitaries... 
+\section{Quantum Computing}
+This section aims to serve as a brief introduction to quantum computing, this may prove 
+to be pedestrian to the experienced but is included to maintain the accessibility 
+of this research report.
+\subsection{Quantum Systems}
+Unlike classical computing, quantum computing acts in a non-deterministic manner,
+the computer remains in multiple states with given probabilities rather than a
+fixed resultant state as expected from classical computers. Formally we can define 
+a qubit to be a quantum system where the states of 0 and 1 are represented by a pair 
+of normalised and mutually orthogonal quantum states $|0\rangle$ and $|1\rangle$. 
+Intuitively however, let's start with a two-state machine; 
+we can describe such system to be in the state 
+$|0\rangle$ with some amplitude $\alpha$ and in $|1\rangle$ with amplitude $\beta$. 
+This can be represented  as
+\begin{equation}\label{eq51}
+|\psi\rangle = \alpha|0\rangle + \beta|1\rangle
+\end{equation}
+for 
+some $\alpha$ and $\beta$ such that $|\alpha|^2+|\beta|^2 = 1$; 
+we can refer to this as a superposition. 
+If measured in the standard basis, we would expect the outcome to be $|k\rangle$ 
+with a certain probability, this outcome resulting in the output state of the 
+measurement gate to also be $|k\rangle$. This would mean our state $|\psi\rangle$
+is irreversibly lost; we refer to this as a collapse of state. Each qubit can 
+be thought of as a vector, $\bold{v}$, on a Bloch's sphere which can be represented in two 
+basis: $\theta$ and $\psi$. $\theta$ is the angle between $\bold{v}$ and the 
+z-axis. $\psi$ becomes the angle between $\bold{v}$ and the x-axis. Considering 
+a more general parameterisation of 
+\ref{eq51} gives us 
+\begin{equation}
+  |\psi\rangle = \cos (\frac{\theta}{2})e^{i\psi_0}|0\rangle + \sin(\frac{\theta}
+  {2})e^{i\psi_{1}}|1\rangle
+\end{equation}
+TALK MORE HERE
+\newp
+When extending to a n-qubit system
+\newp
+Before forming quantum circuits, we must first understand how quantum gates operate. 
+Quantum gates can be thought of as fixed unitary operations on selected qubits, 
+often represented with a $U$. There are many gates but the ones we are concerned 
+with for this project are the $T$, $Rx$, $Ry$, $Rz$ and $CNOT$ gates. Given an 
+angle $\theta$ we can form the universal gates: 
+$$
+R_x(\theta)& = \coloneqq 
+\begin{bmatrix}
+\cos(\theta/2) & -i\sin(\theta/2) \\
+-i\sin(\theta/2) & \cos(\theta/2)
+\end{bmatrix}
+$$
+$$
+R_y(\theta) = \coloneqq 
+\begin{bmatrix}
+\cos(\theta/2) & -\sin(\theta/2) \\
+\sin(\theta/2) & \cos(\theta/2)
+\end{bmatrix}
+$$
+$$
+R_z(\theta) = \coloneqq 
+\begin{bmatrix}
+e^{-i\theta/2} & 0 \\
+0 & e^{i\theta/2}
+\end{bmatrix}
+$$
+$$
+T = \coloneqq 
+\begin{bmatrix}
+1 & 0 \\
+0 & e^{-i\pi/4}
+\end{bmatrix}
+$$
+$$
+CNOT =
+\begin{pmatrix}
+1 & 0 & 0 & 0 \\
+0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 1 \\
+0 & 0 & 1 & 0
+\end{pmatrix}
+$$
+Universal gates, Clifford Gates and non-Clifford gates 
 \subsection{Born Rule}
 An essential part of quantum computing involves the existence of the Born
 Rule. Born's measurement rule states that:
@@ -501,18 +578,8 @@ ancillary qubits
 
 
 
-
-\subsection{Measurements}
-In quantum mechanics, we can define measurement to be any process that probes a 
-given quantum system to obtain information, we may also refer to this process as 
-a measurement in the computational basis when focussing on quantum information 
-science. Let's consider a quantum state 
-$|\psi \rangle = \alpha_0|0\rangle+\alpha_1|1\rangle$ which gives us $|0\rangle$
-with probability $|\alpha_0|^2$ and $|1\rangle$ with probability $|\alpha_1|^2$. 
-If measured in the standard basis we would expect the outcome to be $|k\rangle$
-with a given probability. This outcome would result in the output 
-state of the measurement gate to also be $|k\rangle$, resulting in the original 
-state $|\psi\rangle$ to be irreversibly lost. We can refer to this as a collapse of state. 
+\subsection{Parameterised Quantum Circuits}
+Parameterised quantum circuits.
 
 \clearpage
 \section{Quantum Circuit Born Machine}
