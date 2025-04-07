@@ -30,6 +30,15 @@
  bottom=35mm
  }
 
+\usepackage{fancyhdr}
+\usepackage{lipsum}% just to generate text for the example
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[ER]{\nouppercase\leftmark}
+\fancyhead[OR]{\nouppercase\rightmark}
+\fancyhead[ER,OL]{\thepage}
+
 \newcommand{\detailtexcount}[1]{%
   \immediate\write18{texcount -merge #1.tex > #1.wcdetail }%
   \verbatiminput{#1.wcdetail}%
@@ -174,11 +183,11 @@ Through comparisons between traditional approaches,
 I aim to demonstrate an advantage in the expressibility of Quantum Circuit Born 
 Machines (QCBMs); these will be described quantitatively using measures such as 
 Value at Risk (VaR) and Conditional Value at Risk (CVaR). By performing out-of-sample 
-tests on COVID and Oil data, I aim to highlight the weaknesses of traditional models 
+tests on COVID and Oil stock price data, I aim to highlight the weaknesses of traditional models 
 and showcase a quantum superiority.
 There will also be an exploration into the variety of architectures 
 available for the QCBM, evaluating different ansatz designs. Where unusual behaviours
-due to quantum physics occur, such as barren plateau, I will explore in greater detail 
+due to the quantum nature occur, such as barren plateau, I will explore in greater detail 
 as well as any circuit optimisation techniques that may present themselves as 
 possible solutions. 
 \newp
@@ -278,6 +287,43 @@ The market, though inherently can be thought of as a completely random process,
 where bids and asks are fulfilled, can be modelled as a stochastic process. The 
 aim of this chapter is to serve as a brief introduction and set up notation for 
 later chapters. \\
+
+\subsection{Brownian Motion}
+To represent this stochasticity, we must employ techniques introduced by Norbert 
+Wiener, the Wiener process, more commonly referred to as standard Brownian Motion. 
+This framework allows us to model continuous random 
+walks of our stock price. Formally, a standard Wiener process, $W_t$, is a stochastic 
+process where 
+\begin{enumerate}
+  \item $W_0$ = 0
+  \item The process $W_t$ has stationary, independent increments
+  \item $\forall t \in Z,$ the random variable $W_t$ is normally distributed, $N(0,t)$ 
+  \item The paths of $W_t$ are continuous ensuring no jumps in the path trajectory
+\end{enumerate}
+These assumptions will help us understand the shortfalls of traditional techniques.
+\subsubsection{It\^{o} Process}
+It\^{o} processes are crucial for understanding the mathematical set up for 
+modelling our assets. It\^{o} calculus allows us to extend our understanding of 
+deterministic calculus to the realm of stochasticity. 
+Suppose $X_t$  It\^{o} process can be 
+defined as a stochastic process which can be written in the form 
+\begin{equation}
+  X_t = X_0 + \int^t_0 U_s ds + \int^t_0 V_s dW_s
+\end{equation}
+
+\subsubsection{Geometric Brownian Motion}
+We can extend Brownian Motion to Geometric Brownian Motion by exponentiating the BM; 
+this is done to satisfy the condition that stock prices are non-negative. 
+We can now consider a continuous time process $S(t)$ which satisfies the SDE
+\begin{equation}
+  dS_t = \mu S(t)dt + \sigma S(t)dW_t 
+\end{equation}
+where $\mu$ is the drift parameter, $\sigma$ is the volatility parameter, and 
+$W_t$ is a Wiener process. The solution is given by 
+\begin{equation}
+  S_t = S_0 \exp \left[(\mu-\frac{1}{2}\sigma^2) t + \sigma W_t\right]
+\end{equation}
+
 \subsection{Market}
 Consider a market with a finite time horizon $T$ defined on the probability space 
 ($\Omega,\mathcal{F},P$) along with a filtration $\bold{F} = \{\mathcal{F}| 0 \leq t \leq T \}$ 
@@ -342,7 +388,7 @@ P_T = max(0,K-S_T)
 
 \subsection{Market Data}
 In this research I will be focussing on hedging a portfolio consisting of a single 
-asset, hence requiring a simulation of a single underlying.
+asset, hence requiring a simulation of a single underlying. 
 \subsubsection{Euro Stoxx 50}
 The Euro Stoxx 50 Index (SX5E) and relevant derivatives. This is a stock index of 50 stocks in the Eurozone. 
 This index captures around 60\% of the free-float market capitalisation of the 
@@ -362,9 +408,13 @@ maturity. Data can be found on Bloomberg\autocite{bloomberg_2023_bloomberg} and 
 \end{figure}
 
 \subsubsection{Brent Crude Oil}
-It was appropriate to try and learn a volatile commodity. Sensitive to price 
-movements.
-
+Commodities often have complex dynamics, driven by geopolitical events and natural 
+supply and demand. As well as this, oil in particular lends itself to increased
+volatility often responding to changes by the Federal Reserve and OPEC(Organisation 
+of petroleum-exporting countries). These factors create characteristics such as 
+heavy tails and jumps, often not being represented well by traditional models. 
+I will be using Brent Oil as a benchmark asset to compare the expressibility of 
+quantum derived models vs existing classical ones. 
 \clearpage
 
 \section{Merton-Jump Diffusion Model}
@@ -375,6 +425,23 @@ addition of a compound Poisson jump process. This aims to represent the jumps
 we observe in the market in a more realistic fashion rather than assuming constant 
 volatility assumption made by Black-Scholes. As a simplification, I will be referring 
 to Black-Scholes by BS and Merton-Jump Diffusion with MJD.
+\subsection{Black-Scholes}
+Let's start with the Black-Scholes model, an elementary model first proposed in 
+(give year here) to price European vanilla options. \\
+Consider a call options on a non-dividend paying stock with expiry T and strike K. 
+We will assume that the asset price will obey geometric brownian motion hence 
+giving: 
+\begin{equation}
+dS_t = \mu {S_t} dt + \sigma S_t dW_t
+\end{equation}
+where $W_t$ is a standard Brownian motion. We assume interest rates to be constant,
+meaning a unit of a given currency at time t will be worth $e^{rt}$ at time t.\\
+We can now consider the value of our call option, $C$, at time t, by way of It$\^{o}$s 
+lemma
+we can say that 
+\begin{equation}
+dC = (\muS)
+\end{equation}
 \subsection{Model}
 A standard derivation of the model will allow us to explore its assumptions and 
 limitations. This model consists of two components, jump and diffusion. The 
@@ -458,6 +525,7 @@ expensive, often requiring hundreds of iterations \autocite{jump05}. These diffi
 can translate into a poor hedge, leaving a buyer overexposed to market fluctuations. 
 
 \clearpage
+
 
 \section{Quantum Computing}
 This section aims to serve as a brief introduction to quantum computing, this may prove 
@@ -631,9 +699,95 @@ non clifford gate is.
 
 
 \section{Results}
-
+Putting the theory into practice offered insights into the strengths and weaknesses 
+of the model. This section aims to provide quantitative comparisons between the 
+classical and quantum methods. 
 \subsection{Path Generation}
-\subsubsection{VaR \& CVaR}
+An important part of risk analysis involves path generation, simulating an equity 
+path for the next $n$ days. This provides a range of final values, aiming to 
+simulate price paths accurately in the process. The metrics involved in the analysis 
+involves comparing: the skewness, excess kurtosis, and standard deviation. These 
+can be defined as 
+\\Standard deviation:
+$$
+\sigma = \sqrt{\frac{1}{N} \sum_{i=1}^{N} (r_i - \bar{r})^2}
+$$
+Skewness:
+$$
+\gamma_1 = \frac{\sum_{i=1}^{N} (r_i - \bar{r})^3}{(N-1) \times \sigma^3}
+$$
+
+Excess kurtosis:
+$$
+\gamma_2 = \frac{1}{N}\frac{\sum_{i=1}^{N} (r_i - \bar{r})^4}{\sigma^4} - 3
+$$
+These 
+were chosen to highlight the accuracy of the models as well as the ability to represent 
+subtleties in the data such as the asymmetric nature and fat tails that are often 
+present in market data. 
+As shown in figure[FIGURE NUM],the results highlighted that on training data the 
+MJD model was able to capture the standard deviation better, however the skewness 
+was represented weakly. This is where the QCBM was able to demonstrate superiority, 
+capturing the skewness and excess kurtosis with greater accuracy.  
+\subsection{Volatility Analysis}
+It is also important to analyse if the local behaviour of the equity paths is well 
+captured. We can do this by analysing the volatility; here the shortfalls of the 
+QCBM become clear. Though the global volatility distribution appears to well 
+represented, using GARCH models shows a disparity in observed volatility clustering 
+compared to the quantum generated volatility. This appears to be a fundamental 
+flaw in the model. The assumption that we can represent a path using [give 
+equation for propagating path] leads to poor volatility clustering as we have 
+treated for each time $0\leq t_0 \leq ...\leq t_n$ our random variable 
+$S_{t_r}-S_{t_{r-1}}$ are independent.
+\newp 
+First looking at rolling volatility, we observe acceptable performance by the 
+MJD model, displaying realistic market volatility; the QCBM, however, displayed 
+a worse performance, often underestimating volatility peaks, and overestimating 
+noise as shown in figure [INSERT FIGURE NUM]. This story worsens as we look at 
+using volatility models as a comparison method. 
+\newp
+GARCH (Generalised Autoregressive Conditional Heteroskedasticity) models were 
+first introduced in 1982 by Robert Eagle [add reference here] to model volatility 
+as a non-constant quantity in financial models. The GARCH(1,1) can be defined as 
+so:\\ 
+Let $r_t$ be the asset return at time $t$. This can be decomposed as 
+\begin{equation}
+r_t = \mu + \epsilon_t
+\end{equation}
+where $\mu$ is the mean return and $\epsilon_t = \sigma_t z_t$ where $z \sim N(0,1)$. 
+GARCH models the conditional variance of a given time series process, asset returns in 
+our world, as a function of past squared shocks ($\epsilon^2_{t-1}$) and past 
+conditional variance ($\sigma^2_{t-1}$). Using this, our model equation becomes
+\begin{equation}
+  \sigma^2_t = \omega + \alpha\epsilon^2_{t-1} + \beta\sigma^2_{t-1}
+\end{equation}
+where $\omega > 0$ is the average volatility, $\alpha \geq 0$ is the sensitivity 
+to recent shocks, and $\beta \geq0$ is the persistence of volatility, the tendency
+of volatility to be high for periods of time and then low of periods of time. 
+\newp 
+A further model that improved on GARCH is the Exponential GARCH, another model used 
+for comparison in my findings. This model focussed on asymmetric volatility 
+effects, removing parameter restrictions, and having a logarithmic formulation. 
+We can define an EGARCH(1,1) as follows 
+\begin{equation}
+  \ln(\sigma^2_t) = \omega +\beta\ln(\sigma^2_{t-1})+\gamma\frac{\epsilon_{t-1}}
+  {\sigma_{t-1}} + \alpha\Biggl(\frac{|\epsilon_{t-1}|}{\sigma_{t-1}}-\sqrt{\frac{2}{\pi}}\Biggr)
+\end{equation}
+where the extra term $\gamma$ accounts for the leverage effect; the 
+negative correlation between asset returns and volatility change often 
+observed in markets.
+\newp 
+The implementation and parameter estimation for $\omega$,$\alpha$, $\beta$ and 
+$\gamma$ were all handled by 
+the python package 'arch' [insert this reference https://pypi.org/project/arch/]. 
+Calibrating a EGARCH(1,1) to the different model returns gave the following graph. 
+In figure [FIGURE NUM] we can observe the MJD model displaying more accurate 
+clustering compared to the QCBM which remains conservative. This may suggest that 
+the MJD model is more suitable for predicting volatility over a short period of 
+time. As an improvement to the QCBM, it may be of use to create a hybrid model, 
+one that combines the QCBM and a volatility model of choice. 
+\subsection{VaR \& CVaR}
+VaR(Value at Risk) 
 \subsection{Hedging}
 
 \subsection{Barren Plateau}
