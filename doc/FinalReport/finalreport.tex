@@ -18,7 +18,7 @@
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
 \definecolor{mauve}{rgb}{0.58,0,0.82}
 
-\graphicspath{{figures}}
+\graphicspath{{Figures/}}
 
 \usepackage{geometry}
  \geometry{
@@ -697,17 +697,20 @@ ZX Calculus as a method to optimise/minimise t gate count. introduce what a
 non clifford gate is.
 
 
-
+\newpage
 \section{Results}
 Putting the theory into practice offered insights into the strengths and weaknesses 
 of the model. This section aims to provide quantitative comparisons between the 
-classical and quantum methods. 
+classical and quantum methods. After careful consideration and analysis of parameters 
+for the QCBM, the model used for comparisons against the MJD model is a 13 qubit,
+7 layer model. It uses the brick architecture and has been trained for 500 epochs 
+with an Adam optimiser. 
 \subsection{Path Generation}
 An important part of risk analysis involves path generation, simulating an equity 
 path for the next $n$ days. This provides a range of final values, aiming to 
 simulate price paths accurately in the process. The metrics involved in the analysis 
-involves comparing: the skewness, excess kurtosis, and standard deviation. These 
-can be defined as 
+involves comparing: the skewness, excess kurtosis, and standard deviation. 
+For a return $r_i$ and mean return $\bar{r}$ 
 \\Standard deviation:
 $$
 \sigma = \sqrt{\frac{1}{N} \sum_{i=1}^{N} (r_i - \bar{r})^2}
@@ -725,10 +728,26 @@ These
 were chosen to highlight the accuracy of the models as well as the ability to represent 
 subtleties in the data such as the asymmetric nature and fat tails that are often 
 present in market data. 
-As shown in figure[FIGURE NUM],the results highlighted that on training data the 
+As shown in figure[table],the results highlighted that on training data the 
 MJD model was able to capture the standard deviation better, however the skewness 
 was represented weakly. This is where the QCBM was able to demonstrate superiority, 
-capturing the skewness and excess kurtosis with greater accuracy.  
+capturing the skewness and excess kurtosis with greater accuracy. 
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{compdists.png}
+        \caption{Comparison of distributions}
+        \label{fig:rollingvol}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{pricepath2.png}
+        \caption{Price trajectories for QCBM model}
+        \label{fig:weeklyvol}
+    \end{minipage}
+\end{figure}
 \subsection{Volatility Analysis}
 It is also important to analyse if the local behaviour of the equity paths is well 
 captured. We can do this by analysing the volatility; here the shortfalls of the 
@@ -743,8 +762,35 @@ $S_{t_r}-S_{t_{r-1}}$ are independent.
 First looking at rolling volatility, we observe acceptable performance by the 
 MJD model, displaying realistic market volatility; the QCBM, however, displayed 
 a worse performance, often underestimating volatility peaks, and overestimating 
-noise as shown in figure [INSERT FIGURE NUM]. This story worsens as we look at 
-using volatility models as a comparison method. 
+noise as shown in figure \ref{fig:rollingvol}.
+This heightened noise is also reflected 
+in figure \ref{fig:weeklyvol} where we see on a weekly basis, the QCBM 
+constantly overestimated the volatility. We can observe the difference in learnt 
+volatility by comparing distributions. Figure \ref{fig:voldist2} shows us how the 
+volatility is skewed with a larger mean and lack of kurtosis. 
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{rollingvol.png}
+        \caption{Comparison of rolling volatility (20-day window)}
+        \label{fig:rollingvol}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{weeklyvol.png}
+        \caption{Comparison of weekly volatility}
+        \label{fig:weeklyvol}
+    \end{minipage}
+\end{figure}
+\begin{figure}[h!]
+  \centering 
+  \includegraphics[scale=0.35]{voldist2.png}
+  \caption{Comparison of volatility distributions}
+  \label{fig:voldist2}
+\end{figure}
+This story worsens as we look at using volatility models as a comparison method. 
 \newp
 GARCH (Generalised Autoregressive Conditional Heteroskedasticity) models were 
 first introduced in 1982 by Robert Eagle [add reference here] to model volatility 
@@ -777,15 +823,23 @@ where the extra term $\gamma$ accounts for the leverage effect; the
 negative correlation between asset returns and volatility change often 
 observed in markets.
 \newp 
+\begin{figure}[h!]
+  \centering 
+  \includegraphics[scale=0.4]{egarch2.png}
+  \caption{EGARCH model fit to models}
+  \label{fig:egarch2}
+\end{figure}
 The implementation and parameter estimation for $\omega$,$\alpha$, $\beta$ and 
 $\gamma$ were all handled by 
 the python package 'arch' [insert this reference https://pypi.org/project/arch/]. 
 Calibrating a EGARCH(1,1) to the different model returns gave the following graph. 
-In figure [FIGURE NUM] we can observe the MJD model displaying more accurate 
+In figure \ref{fig:egarch2} we can observe the MJD model displaying more accurate 
 clustering compared to the QCBM which remains conservative. This may suggest that 
 the MJD model is more suitable for predicting volatility over a short period of 
 time. As an improvement to the QCBM, it may be of use to create a hybrid model, 
 one that combines the QCBM and a volatility model of choice. 
+
+\newpage
 \subsection{VaR \& CVaR}
 VaR(Value at Risk) 
 \subsection{Hedging}
