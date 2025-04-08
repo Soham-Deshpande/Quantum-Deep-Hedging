@@ -636,7 +636,8 @@ a process once convergence is reached, will generate accurate samples
 We require state preparation to transfer the classical data onto the 
 Hilbert space. This involves a function $\phi$ that maps the input vector to 
 an output label. There are many encoding schemes, each of which aim to offer 
-high information density and low error rates; main methods include: basis, amplitude, angle encoding, and QRAM. 
+high information density and low error rates; main methods include: basis, amplitude,
+angle encoding, and QRAM. 
 \\
 Without the use of ancillary qubits, we can expect an exponential circuit depth
 to prepare an arbitrary quantum state. Using them we can reduce the depth to be 
@@ -678,11 +679,6 @@ where $k$ is a model parameter. The resulting space therefore spans to:
 $(2^m)^{n\cdot m}$.
 
 
-\subsection{Architectures}
-\subsubsection{Brick}
-\subsubsection{Pyramid}
-\subsubsection{Butterfly}
-
 \subsection{Barren Plateau}
 A point of concern when searching for the optimal set of $\theta s$ is the large 
 search space, here we may observe issues such as barren plateau(BP). BP 
@@ -690,6 +686,28 @@ insists that the gradient of the parameters of a given PQC will vanish exponenti
 w.r.t the search space.
 \\ 
 Introduce proof of $\frac{\partial C}{\partial \theta} \rightarrow 0 $
+
+
+\subsection{Architectures}
+The design of the ansatz can significantly affect the ability to learn and represent 
+the target distribution. The number of gates, depth, and entanglement structure
+all affect the expressibility and trainability of the circuit. Circuits with 
+higher entanglement and parameterised gates are theoretically able to represent 
+any distribution, though it comes at the cost of noise and barren plateaus. 
+Choosing a simpler ansatz may converge quicker but results in a weaker approximation,
+oversimplifying the solution. 
+\\
+The architecture will also affect the optimisation landscape; random parameterised 
+circuits with deep, unstructured layers are more prone to barren plateaus
+
+Due to this we strive for a balance, one that is 
+able to learn the complexities of the market without compromising on finding the 
+optimal parameters. 
+\subsubsection{Brick}
+\subsubsection{Pyramid}
+\subsubsection{Butterfly}
+
+
 
 
 \subsection{ZX Calculus}
@@ -727,27 +745,105 @@ $$
 These 
 were chosen to highlight the accuracy of the models as well as the ability to represent 
 subtleties in the data such as the asymmetric nature and fat tails that are often 
-present in market data. 
-As shown in figure[table],the results highlighted that on training data the 
+present in market data. Both models were first calibrated on Brent Crude Oil stock 
+prices. The test period combines the training and unseen data to see how well the 
+model is able to perform on out-of-sample prices. The period of data includes the 
+recent reaction to Trump's tariffs, April 2025. This included purposely to observe 
+the model's resilience to tough market activity and heightened volatility. 
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Parameter} & \textbf{Value} \\
+\hline
+Drift ($\mu$) & 0.37956244 \\
+Volatility ($\sigma$) & 0.40736202 \\
+Jump Intensity ($\lambda$) & 530.63931692 \\
+Jump Mean ($\mu_J$) & -0.00374471 \\
+Jump Variance ($\sigma_J^2$) & 0.00065703 \\
+\hline
+\end{tabular}
+\caption{Calibrated Parameters of the MJD Model for Brent Crude Oil}
+\label{tab:mjd_params}
+\end{table}
+\begin{table}[h!]
+\centering
+\begin{tabular}{|l|c|c|c|}
+\hline
+\begin{table}[h!]
+\centering
+\begin{tabular}{lcccc}
+\hline
+\textbf{} & \textbf{Original Data}& \textbf{Test Data} & \textbf{Synthetic Data} & \textbf{MJD Data} \\
+\hline 
+Standard Deviation  & 0.0120 & 0.0124 & 0.0120 \\
+Skewness            & 0.8602 & 0.7451 & -0.8631 \\
+Excess Kurtosis     & 11.5700 & 11.3780 & 11.4330 \\
+\hline
+\end{tabular}
+\caption{Comparison of Statistical Moments: Original, Synthetic, and MJD Data}
+\label{tab:comparison_moments}
+\end{table}
+\begin{table}[h!]
+\centering
+\begin{tabular}{lccccc}
+\hline
+\textbf{} & \textbf{Original Data} & \textbf{Test Data} & \textbf{MJD Data} & \textbf{Synthetic Data} \\
+\hline 
+Standard Deviation & 0.0233 &0.0225 & 0.02647 & 0.0268   \\
+Skewness            & 0.6550 &0.6709 & -0.2579 & 0.6215 \\
+Excess Kurtosis     & 8.5986 &8.8553 & 7.4809 & 8.7375  \\
+\hline
+\end{tabular}
+\caption{Comparison of Brent test Data with MJD and Synthetic Data}
+\label{tab:data}
+\end{table}
+
+As shown in table \ref{tab:data}, the results highlighted that on training data 
+for Brent Crude Oil, the 
 MJD model was able to capture the standard deviation better, however the skewness 
-was represented weakly. This is where the QCBM was able to demonstrate superiority, 
+and excess kurtosis was represented weakly. This is where the QCBM was able to 
+demonstrate superiority, 
 capturing the skewness and excess kurtosis with greater accuracy. 
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{realpricepath.png}
+        \caption{True price path}
+        \label{fig:realpricepath}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{mjdpricepath.png}
+        \caption{Price trajectories for MJD model}
+        \label{fig:mjdpricepath}
+    \end{minipage}
+\end{figure}
 \begin{figure}[h!]
     \centering
     \begin{minipage}{0.48\textwidth}
         \centering
         \includegraphics[width=\linewidth]{compdists.png}
         \caption{Comparison of distributions}
-        \label{fig:rollingvol}
+        \label{fig:compdists}
     \end{minipage}
     \hfill
     \begin{minipage}{0.48\textwidth}
         \centering
         \includegraphics[width=\linewidth]{pricepath2.png}
         \caption{Price trajectories for QCBM model}
-        \label{fig:weeklyvol}
+        \label{fig:pricepath}
     \end{minipage}
 \end{figure}
+A comparison of the log return distributions indicates the lack of tail representation 
+with the MJD model. It is important to note that different parameters for the QCBM 
+gave significantly different results. Adding only 1 more qubit led to an 
+over-estimation in kurtosis as well as poor representation of the standard 
+deviation. From figure \ref{fig:pricepath} we can see behaviour that would on 
+first glance mimic the real market. Jumps in the market look realistic, and 
+trajectories take believable paths. 
 \subsection{Volatility Analysis}
 It is also important to analyse if the local behaviour of the equity paths is well 
 captured. We can do this by analysing the volatility; here the shortfalls of the 
@@ -857,7 +953,7 @@ VaR(Value at Risk)
 \section{Appendix}
 \subsection{QCBM Architectures}
 
-\begin{figure}[h]
+\begin{figure}[h!]
     \centering
     \includegraphics[scale=0.3, angle=270, width=\textwidth-209]{qcbm1.png}
     \caption{QCBM architecture}
