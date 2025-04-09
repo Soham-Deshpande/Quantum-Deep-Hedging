@@ -748,8 +748,8 @@ subtleties in the data such as the asymmetric nature and fat tails that are ofte
 present in market data. Both models were first calibrated on Brent Crude Oil stock 
 prices. The test period combines the training and unseen data to see how well the 
 model is able to perform on out-of-sample prices. The period of data includes the 
-recent reaction to Trump's tariffs, April 2025. This included purposely to observe 
-the model's resilience to tough market activity and heightened volatility. 
+recent reaction to Trump's tariffs, April 2025. This was included purposely to observe 
+the model's resilience to tough market activity and heightened volatility.
 \begin{table}[h!]
 \centering
 \begin{tabular}{|l|c|}
@@ -766,45 +766,60 @@ Jump Variance ($\sigma_J^2$) & 0.00065703 \\
 \caption{Calibrated Parameters of the MJD Model for Brent Crude Oil}
 \label{tab:mjd_params}
 \end{table}
-\begin{table}[h!]
-\centering
-\begin{tabular}{|l|c|c|c|}
-\hline
-\begin{table}[h!]
-\centering
-\begin{tabular}{lcccc}
-\hline
-\textbf{} & \textbf{Original Data}& \textbf{Test Data} & \textbf{Synthetic Data} & \textbf{MJD Data} \\
-\hline 
-Standard Deviation  & 0.0120 & 0.0124 & 0.0120 \\
-Skewness            & 0.8602 & 0.7451 & -0.8631 \\
-Excess Kurtosis     & 11.5700 & 11.3780 & 11.4330 \\
-\hline
-\end{tabular}
-\caption{Comparison of Statistical Moments: Original, Synthetic, and MJD Data}
-\label{tab:comparison_moments}
-\end{table}
+
 \begin{table}[h!]
 \centering
 \begin{tabular}{lccccc}
 \hline
-\textbf{} & \textbf{Original Data} & \textbf{Test Data} & \textbf{MJD Data} & \textbf{Synthetic Data} \\
+\textbf{} & \textbf{Original Data} & \textbf{Test Data} & \textbf{MJD Data} & \textbf{QCBM Data} \\
 \hline 
 Standard Deviation & 0.0233 &0.0225 & 0.02647 & 0.0268   \\
 Skewness            & 0.6550 &0.6709 & -0.2579 & 0.6215 \\
 Excess Kurtosis     & 8.5986 &8.8553 & 7.4809 & 8.7375  \\
 \hline
 \end{tabular}
-\caption{Comparison of Brent test Data with MJD and Synthetic Data}
-\label{tab:data}
+\caption{Comparison of Brent data with MJD and QCBM Data}
+\label{tab:brentdata}
 \end{table}
 
-As shown in table \ref{tab:data}, the results highlighted that on training data 
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{lcccc}
+\hline
+\textbf{} & \textbf{Original Data} & \textbf{Test Data} & \textbf{MJD Data} & \textbf{QCBM Data} \\
+\hline 
+Standard Deviation  & 0.0120  & 0.0270  & 0.0126  & 0.0124 \\
+Skewness            & 0.8602  & 1.1640  & -0.2015 & 0.7451 \\
+Excess Kurtosis     & 11.5700 & 5.6518  & 11.4330 & 11.3780 \\
+\hline
+\end{tabular}
+\caption{Comparison of Eurexx Data with MJD and QCBM Data}
+\label{tab:eurexxdata}
+\end{table}
+
+
+
+As shown in table \ref{tab:brentdata}, the results highlighted that on training data 
 for Brent Crude Oil, the 
 MJD model was able to capture the standard deviation better, however the skewness 
 and excess kurtosis was represented weakly. This is where the QCBM was able to 
 demonstrate superiority, 
-capturing the skewness and excess kurtosis with greater accuracy. 
+capturing the skewness and excess kurtosis with greater accuracy.
+\newp 
+Table \ref{tab:eurexxdata} supports most of the arguments made, though has shown 
+slight superiority in representing the fat tails during the training period. 
+As the Eurexx data contains less extreme jumps, we can see the MJD model perform 
+better. That being said, we can still observe the skewness being learnt poorly
+by the classical model. The test data chosen is a continuation of the training data,
+both models showing clear difficulties in generalisation. This can be excused however 
+as the metrics differ hugely from the training data. This does raise a point of 
+concern whether these methods employed of market behaviour prediction are 
+appropriate. For this reason, it is more appropriate to treat the models as a 
+synthetic market generator rather than for the purposes of prediction. The differences 
+in the MJD performance should be noted, highlighting how classical methods 
+tend to struggle in tougher market conditions; this is will be further investigated 
+in the following sections.
 \begin{figure}[h!]
     \centering
     \begin{minipage}{0.48\textwidth}
@@ -821,6 +836,7 @@ capturing the skewness and excess kurtosis with greater accuracy.
         \label{fig:mjdpricepath}
     \end{minipage}
 \end{figure}
+
 \begin{figure}[h!]
     \centering
     \begin{minipage}{0.48\textwidth}
@@ -837,13 +853,49 @@ capturing the skewness and excess kurtosis with greater accuracy.
         \label{fig:pricepath}
     \end{minipage}
 \end{figure}
+
 A comparison of the log return distributions indicates the lack of tail representation 
 with the MJD model. It is important to note that different parameters for the QCBM 
 gave significantly different results. Adding only 1 more qubit led to an 
 over-estimation in kurtosis as well as poor representation of the standard 
 deviation. From figure \ref{fig:pricepath} we can see behaviour that would on 
 first glance mimic the real market. Jumps in the market look realistic, and 
-trajectories take believable paths. 
+trajectories take believable paths.
+
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{logreturns.png}
+        \caption{Log returns}
+        \label{fig:compdists}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{cumsum.png}
+        \caption{Cumulative sum of returns}
+        \label{fig:pricepath}
+    \end{minipage}
+\end{figure}
+
+
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{weeklyacfog.png}
+        \caption{Weekly ACF for training data}
+        \label{fig:compdists}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{weeklyacfqcbm.png}
+        \caption{Weekly ACF for QCBM data}
+        \label{fig:pricepath}
+    \end{minipage}
+\end{figure}
 \subsection{Volatility Analysis}
 It is also important to analyse if the local behaviour of the equity paths is well 
 captured. We can do this by analysing the volatility; here the shortfalls of the 
@@ -937,7 +989,80 @@ one that combines the QCBM and a volatility model of choice.
 
 \newpage
 \subsection{VaR \& CVaR}
-VaR(Value at Risk) 
+To determine the usefulness of the generator for hedging purposes, we must explore 
+how both generators perform in the extreme percentiles. These are the scenarios 
+that we call Black-Swan events; an event that is unexpected, infrequent but has 
+huge financial implications. Not being hedged against such changes can leave an 
+investor in unwanted positions, exposed to large changes and at risk of losing 
+a lot of money. To quantify expected loss a market may give, we employ techniques 
+such as VaR(Value at Risk) and CVaR(Conditional Value at Risk). 
+\newp 
+VaR is a measure that focuses on the loss at a given percentile under normal 
+market conditions. It provides a threshold such that the probability of a loss 
+exceeding a given value is a chosen percentile i.e 1\% or 5\%. An intuitive 
+way to think about it is 1\% VaR of -0.05 means there is a 1\% chance of 
+losing at least 5\% of the portfolio value. Mathematically we can define VaR:\\ 
+Let $X$ be a random variable with cdf $F_{X}(z)=P\{X\leq z\}$, this is our loss function. 
+The VaR of $X$ at a confidence level $\alpha$ is given by
+\begin{equation}
+  VaR_\alpha(X) = \min\{z|F_X(z)\geq \alpha\}
+\end{equation}
+VaR, however, has a few crucial limitations. VaR does not say anything about the 
+size of losses made after the given $\alpha$ value. This makes it very hard to 
+quantify the loss an investor may be exposed to. VaR also assumes liquidity in 
+the market at any position when in reality during periods of market stress, the 
+ability to buy or sell at any price can be very difficult. It should also be 
+known that VaR has a non-subadditivity constraint, meaning VaR for different portfolios 
+cannot be added together. For these reasons we opt to use Conditional Value at 
+Risk, a more sophisticated tool designed to overcome the given limitations. 
+\newp 
+CVaR focusses on measuring the risk of extreme losses. Instead of considering of 
+considering the probability of losing a given amount, we instead focus on how 
+much is lost in the given quantile. This quantifies our tail risk, making it 
+appropriate for evaluating the heavy tails of our market generators. Intuitively 
+a 1\% CVaR of -0.05 means that, in the worst 1\% of cases, the average loss is 5\%. 
+We can define CVaR at a level $\alpha$ as 
+\begin{equation}
+  CVaR_{\alpha}(X) = \mathbb{E}[X | X \geq VaR_{\alpha}(X)]
+\end{equation}
+This provides us with a sturdier framework to evaluate performances although we 
+must still be careful of its assumptions and limitations. We must assume that the 
+distribution of the loss is measured accurately and market conditions are also 
+represented faithfully within the given time window. Once we accept these to be 
+true, we are provided with a method to compare strategies and generators, as well 
+as conforming to financial regulations such as Basel III.
+\newp 
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{lcc}
+\hline
+\textbf{} & \textbf{VaR (1\%)} & \textbf{CVaR (1\%)} \\
+\hline
+Original Data     & -0.0171 & -0.0174 \\
+QCBM Simulated    & -0.0291 & -0.0308 \\
+MJDM Simulated    & -0.0360 & -0.0377 \\
+\hline
+\end{tabular}
+\caption{Value at Risk and Conditional Value at Risk at the 1\% Quantile}
+\label{tab:var_cvar_1}
+\end{table}
+\begin{table}[h!]
+\centering
+\begin{tabular}{lcc}
+\hline
+\textbf{} & \textbf{VaR (5\%)} & \textbf{CVaR (5\%)} \\
+\hline
+Original Data     & -0.0159 & -0.0167 \\
+QCBM Simulated    & -0.0223 & -0.0270 \\
+MJDM Simulated    & -0.0283 & -0.0338 \\
+\hline
+\end{tabular}
+\caption{Value at Risk and Conditional Value at Risk at the 5\% Quantile}
+\label{tab:var_cvar_5}
+\end{table}
+
+\newpage
 \subsection{Hedging}
 
 \subsection{Barren Plateau}
