@@ -1032,7 +1032,10 @@ represented faithfully within the given time window. Once we accept these to be
 true, we are provided with a method to compare strategies and generators, as well 
 as conforming to financial regulations such as Basel III.
 \newp 
-
+The first test was on Eurexx data from the COVID period. This was excluded from the training 
+dataset to be used as an extreme market situation. Market generators need to be 
+resilient and able to account such market shocks, these are the scenarios where 
+hedging positions stop investors from losing large amounts of money.
 \begin{table}[h!]
 \centering
 \begin{tabular}{lcc}
@@ -1044,8 +1047,8 @@ QCBM Simulated    & -0.0291 & -0.0308 \\
 MJDM Simulated    & -0.0360 & -0.0377 \\
 \hline
 \end{tabular}
-\caption{Value at Risk and Conditional Value at Risk at the 1\% Quantile}
-\label{tab:var_cvar_1}
+\caption{VaR \& CVaR at the 1\% Quantile for COVID data}
+\label{tab:cvar_1}
 \end{table}
 \begin{table}[h!]
 \centering
@@ -1058,9 +1061,76 @@ QCBM Simulated    & -0.0223 & -0.0270 \\
 MJDM Simulated    & -0.0283 & -0.0338 \\
 \hline
 \end{tabular}
-\caption{Value at Risk and Conditional Value at Risk at the 5\% Quantile}
-\label{tab:var_cvar_5}
+\caption{VaR \& CVaR at the 5\% Quantile for COVID data}
+\label{tab:cvar_5}
 \end{table}
+At the 1\% quantile we can see both
+the MJD and QCBM exhibit greater losses in the tails compared to the real data.
+The QCBM has a VaR of 2.91\% and CVaR of 3.08\%, these are both significant 
+overestimates of tail risk present in the training data. The MJD overestimates 
+the tail risk even greater, expecting much larger than expected losses. We could 
+explain this due to the jump component. These pessimistic scenarios, though 
+stopping large losses, in reality may lead to over hedging, a situation where a 
+given investor may be too protected to the market, limiting potential gains. These 
+scenarios may be suboptimal for a deep hedging engine, where the optimal hedge 
+is going to be larger than needed. 
+\newp 
+At the 5\% quantile we see a similar story fold out, both generators estimating 
+the tail risk to be greater than observed. The QCBM once again provides a closer 
+score to the data, indicating the model is more suitable for hedging purposes, 
+though only marginally. What should be noted is the large gap between the VaR 
+and CVaR, indicating the MJD model has accounted for significant market shocks,
+indicating high sensitivity to extreme events.\\
+\newp 
+The next scenario is on the unseen continuation of the Brent Crude Oil dataset,
+though not excluded purposely than just for out-of-sample testing, the market 
+conditions observed have been very volatile. As mentioned earlier, the effect of 
+Trump's tariffs were felt in all markets, particularly affecting assets denominated 
+in the US dollar. Though as unfortunate as the scenario may be to investors, this 
+has provided me with an excellent test for the two models. 
+\begin{table}[h!]
+\centering
+\begin{tabular}{lcc}
+\hline
+\textbf{} & \textbf{VaR (1\%)} & \textbf{CVaR (1\%)} \\
+\hline
+Original Data     & -0.0300 & -0.0342 \\
+QCBM Simulated    & -0.0429 & -0.0524 \\
+MJDM Simulated    & -0.0522 & -0.0631 \\
+\hline
+\end{tabular}
+\caption{VaR \& CVaR at the 1\% Quantile for Brent Crude Data}
+\label{tab:cvar_1_brent}
+\end{table}
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{lcc}
+\hline
+\textbf{} & \textbf{VaR (5\%)} & \textbf{CVaR (5\%)} \\
+\hline
+Original Data     & -0.0239 & -0.0274 \\
+QCBM Simulated    & -0.0313 & -0.0391 \\
+MJDM Simulated    & -0.0414 & -0.0508 \\
+\hline
+\end{tabular}
+\caption{VaR \& CVaR at the 5\% Quantile for Brent Crude Data}
+\label{tab:cvar_5_brent}
+\end{table}
+Though the data was more volatile, both models demonstrated that they 
+are able to capture the tail risk. The training dataset had large amounts of 
+volatility so we would expect good representation of tail risk. 
+As seen with the COVID results, 
+the models are overestimating the downside risk with scenarios showing 
+greater loss than expected. The large gap between the VaR and CVaR values once 
+again tells us that the underlying models predict tail events far higher than 
+observed in the market. It should be said that the QCBM model is able to reflect 
+the tail risk more accurately than the MJD, with value that are closer to the 
+original data. One might make conclusions that this makes the QCBM a useful model 
+but the poor performance to the original data raises concerns; we can however 
+say that the model is more appropriate to use than the MJD in this scenario. 
+
+
 
 \newpage
 \subsection{Hedging}
@@ -1073,6 +1143,7 @@ MJDM Simulated    & -0.0283 & -0.0338 \\
 
 \section{Outlook and Conclusions}
 
+[add in the conclusion, large hedges are suboptimal, and traders underhedge anyways]
 
 \clearpage
 \section{Appendix}
