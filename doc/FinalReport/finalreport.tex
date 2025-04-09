@@ -854,13 +854,22 @@ in the following sections.
     \end{minipage}
 \end{figure}
 
-A comparison of the log return distributions indicates the lack of tail representation 
-with the MJD model. It is important to note that different parameters for the QCBM 
+A comparison of the log return distributions in figure \ref{fig:compdists}  
+indicates the lack of tail representation 
+with the MJD model with QCBM's being visible but with higher density. 
+It is important to note that different parameters for the QCBM 
 gave significantly different results. Adding only 1 more qubit led to an 
 over-estimation in kurtosis as well as poor representation of the standard 
 deviation. From figure \ref{fig:pricepath} we can see behaviour that would on 
 first glance mimic the real market. Jumps in the market look realistic, and 
-trajectories take believable paths.
+trajectories take believable paths. The graph of log returns, figure \ref{fig:logreturns} 
+shows us the heightened 
+log returns in the QCBM with occasional peaks as observed in the market data.
+This raises some concerns on whether this would lead to over-hedging if used in 
+a hedging engine. The cumulative sum of returns shows a similarity in the global 
+returns we would expect, the MJD in this regard performs weakly, indicating that 
+the market returned higher returns, an assumption that may lead to under-hedging,
+leaving an investor exposed to more risk than calculated. 
 
 \begin{figure}[h!]
     \centering
@@ -868,34 +877,55 @@ trajectories take believable paths.
         \centering
         \includegraphics[width=\linewidth]{logreturns.png}
         \caption{Log returns}
-        \label{fig:compdists}
+        \label{fig:logreturns}
     \end{minipage}
     \hfill
     \begin{minipage}{0.48\textwidth}
         \centering
         \includegraphics[width=\linewidth]{cumsum.png}
         \caption{Cumulative sum of returns}
-        \label{fig:pricepath}
+        \label{fig:cumsum}
     \end{minipage}
 \end{figure}
 
-
+We can also compare the ACF(Autocorrelation Function) values to see how well the 
+QCBM has replicated the structure of the original dataset. ACF aims to quantify 
+the correlation between observations separated by a lag value, $k$. This will 
+give us insight into market microstructures within the original data as well as 
+seeing if the QCBM is able to learn these complexities as well. Formally the ACF 
+for a lag $k$ and time series $X$, can be defined as:
+\begin{equation}
+  \rho_k = \frac{Cov(X_t, X_{t-k})}{\sqrt{Var(X_t)\cdot Var(X_{t-k})}}
+\end{equation}
 \begin{figure}[h!]
     \centering
     \begin{minipage}{0.48\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{weeklyacfog.png}
-        \caption{Weekly ACF for training data}
-        \label{fig:compdists}
+        \includegraphics[width=\linewidth]{acfog.png}
+        \caption{ACF plot of market data}
+        \label{fig:weeklyacfog}
     \end{minipage}
     \hfill
     \begin{minipage}{0.48\textwidth}
         \centering
-        \includegraphics[width=\linewidth]{weeklyacfqcbm.png}
-        \caption{Weekly ACF for QCBM data}
-        \label{fig:pricepath}
+        \includegraphics[width=\linewidth]{acfqcbm.png}
+        \caption{ACF plot of QCBM data}
+        \label{fig:weeklyacfqcbm}
     \end{minipage}
 \end{figure}
+\begin{figure}[h!]
+  \centering
+  \includegraphics[scale=0.5]{acfmjd.png}
+  \caption{ACF plot of MJD data}
+  \label{fig:weeklyacfmjd}
+\end{figure}
+Plots \ref{fig:weeklyacfog} and \ref{fig:weeklyacfqcbm} show the structure of 
+the training data vs the QCBM data. The market data shows significant correlation 
+between the lags, indicating volatility clustering. This is not reflected in the 
+QCBM data, with random spikes showing the model struggles with representing 
+volatility persistence. Similar behaviour is observed in the MJD model as shown in 
+figure \ref{fig:weeklyacfmjd}. We continue this analysis in further detail in the next section. 
+\newpage
 \subsection{Volatility Analysis}
 It is also important to analyse if the local behaviour of the equity paths is well 
 captured. We can do this by analysing the volatility; here the shortfalls of the 
