@@ -410,6 +410,39 @@ of petroleum-exporting countries). These factors create characteristics such as
 heavy tails and jumps, often not being represented well by traditional models. 
 I will be using Brent Oil as a benchmark asset to compare the expressibility of 
 quantum derived models vs existing classical ones. 
+
+
+\subsection{Hedging}
+The main issue being tackled in this report is the idea of optimal hedging. 
+Hedging itself is the process of mitigating risk through trading other products. 
+In this report, I am focussing on hedging an option with an underlying being the 
+asset itself. Traditionally hedging involved deriving the exposure to the market, 
+after buying an option, using a closed-form solution to classical models. The most 
+commonly used is the delta exposure, derived from the Black-Scholes equation. 
+The delta of an option is sensitive to the other parameters in BS, the one we're 
+most concerned with being the underlying. Delta itself can be thought of as 
+$\frac{\partial V}{\partial S}$, the change in the option price with respect to 
+the underlying. 
+The basic strategy for limiting risk is delta-hedging. This involves analysing 
+the combined delta of the options bought and then buying the proportional amount 
+in the underlying asset. 
+\newp 
+The biggest problems with delta-hedging include inaccurate assumptions about the 
+underlying's behaviour, only hedging against the delta of the option, and the idea 
+of when to hedge. One might take the strategy of hedging whenever the delta of 
+the option reaches certain limits, called band-based hedging. This can be done 
+efficiently if you are aware of how the option will react for its entire lifetime. 
+Unfortunately we don't have such oracles that accurately predict the future, so 
+we are left to mathematical assumptions and machine learning techniques to 
+model such behaviour. 
+\newp 
+Deep hedging formulates hedging as a machine learning problem of determining the 
+optimal points to hedge an option. Some papers treat this as a reinforcement 
+problem, while others rely on time-series analysis. The common theme between 
+most models available is the need for an accurate market generator. The underlying 
+asset has to be simulated till maturity of the option to determine the best time 
+to take a position. For this reason I will be focussing on the accuracy of the 
+market generator in the context of deep hedging. 
 \clearpage
 
 \section{Merton-Jump Diffusion Model}
@@ -783,13 +816,98 @@ implication of barren plateau. These issue made it unsuitable for use.
   \caption{10x5 Butterfly Ansatz}
   \label{fig:butterfly}
 \end{figure}
-
-
 \newpage
+
+\subsection{Clifford and non-Clifford Gates}
+Often articles focus on the benefits of quantum computing being superposition 
+and entanglement but we can think beyond that and consider those gates that can't
+be efficiently simulated classically, the untold heroes. 
+The operations we have discussed previously such as Pauli $X$, $CNOT$ etc. can be put 
+into two main categories: Clifford and non-Clifford. The Clifford group involves 
+those gates that can be simulated efficiently classically, with non-Clifford 
+containing those that are responsible for the quantum speedups observed such as 
+the T-gates. 
+\newp 
+Clifford group contains those gates that map Pauli operators to other Pauli 
+operators under conjugation. We can formally say that for a Clifford unitary, $U$, 
+and for every Pauli operator, $P$, $UPU^{\dagger}$ is still a Pauli operator. 
+These, however, do not form a universal set of quantum gates so require 
+non-Clifford operators. Though not able to represent every possible operation,
+they still serve a large purpose, typically being used in quantum error correction 
+algorithms or for testing entanglement. 
+\newp 
+Non-Clifford gates are those that cannot be simulated efficiently on a classical 
+machine, a common being the T-gate. 
+\begin{equation}
+  T = 
+  \begin{pmatrix} 
+1 & 0 \\ 
+0 & e^{i\pi/4} 
+\end{pmatrix} 
+\end{equation}
+An important property that defines this as non-Clifford is the fact that is doesn't 
+preserve the Pauli group under conjugation. Formally 
+\begin{equation}
+  TXT^{\dagger} \neq \text{Pauli Operator}
+\end{equation}
+Another important gate is the Toffoli gate which serves as a three-qubit gate 
+that applies a NOT operation the third qubit if the first two qubits are in the 
+$|1\rangle$ state.
+\newp 
+Non-Clifford gates can be non-trivial to implement unfortunately. These often 
+require non-transversal methods which can increase the error propagation.
+
+EXPLAIN A BIT MORE HERE
+
+
+
 \subsection{ZX Calculus}
 ZX Calculus as a method to optimise/minimise t gate count. introduce what a 
 non clifford gate is.
-
+\newp 
+ZX Calculus is a graphical language designed to express the relationships between 
+qubits based on category theory. Instead of thinking about the linear maps taking place
+in the form of matrices, we can reason about it in a diagrammatic way. This 
+can make analysing quantum processes easier and more intuitive. This approach 
+makes identifying circuit equalities easier, rather than working out the resultant 
+matrix operation for two given circuits. ZX calculus represents the quantum states 
+and maps as 'spiders' and 'wires'. 
+\newp 
+At the heart of ZX calculus are two types of generators: Z-spiders and X-spiders,
+represented by green and red nodes respectively. First looking at the Z-spider: 
+\begin{equation}
+  Z^n_m[\alpha] = |0\rangle^{\otimes n}\lange0|^{\otimes m}+e^{i\alpha}
+  |1\rangle^{\otimes n}\langle1|^{\otimes m}
+\end{equation}
+where m is the number of inputs, n is the number of outputs and $\alpha$ is the 
+phase.
+\newp
+X-spiders are similar to Z-spiders but everything is defined in the X-basis rather 
+than the Z-basis. 
+\begin{equation}
+  X^n_m[\alpha] = |+\rangle^{\otimes n}\langle +|^{\otimes m}+e^{i\alpha}| -\rangle 
+  ^{\otimes n}\langle - | ^{\otimes m}
+\end{equation}
+Thinking about the X-spiders in the Z-basis gives us the following: 
+\begin{equation}
+  \begin{split}
+    |+\rangle &= \frac{1}{\sqrt2}(|0\rangle+|1\rangle)\\
+    |-\rangle &= \frac{1}{\sqrt2}(|0\rangle-|1\rangle)
+  \end{split}
+\end{equation}
+and by symmetry
+\begin{equation}
+  \begin{split}
+    |0\rangle &= \frac{1}{\sqrt2}(|+\rangle+|-\rangle)\\
+    |1\rangle &= \frac{1}{\sqrt2}(|+\rangle-|-\rangle)
+  \end{split}
+\end{equation}
+The graphical rules of ZX calculus allow for spider fusions, copying and wire 
+transformations, all that correspond to those from category theory. It is crucial 
+to note that ZX calculus is universal for quantum computations, so any computation 
+to exist can be represented and reasoned about within this framework. 
+\subsubsection{Gate Optimisation}
+Gate optimisation section here.
 
 \newpage
 \section{Results}
@@ -1238,9 +1356,6 @@ say that the model is more appropriate to use than the MJD in this scenario.
 
 
 
-\newpage
-\subsection{Hedging}
-
 \subsection{Barren Plateau}
 Upon training it was evident that the circuits used: Brick, Butterfly, and Pyramid 
 included, all had issues with trainability; the loss function would converge 
@@ -1254,7 +1369,7 @@ us results that were unexpected. Figure \ref{fig:gradvar} shows us that the
 variance of the gradient increases as we increase the qubit count, going against 
 what the maths would suggest. One theory was that the nature of the data led to 
 such phenomenon. 
-\newp 
+\newp
 To confirm such beliefs, I used the QCBM to learn several distributions. These 
 included:
 \begin{itemize}
@@ -1318,8 +1433,15 @@ just barren plateau. This effect was beyond the scope of this report but can be
 investigated after this project. 
 \subsubsection{ZX Calculus}
 
-\clearpage 
+I first plotted the loss landscape for some of the gate combinations to visualise 
+how the loss changes with different gate pairs. As shown in the graphs, the 
+optimisation process for the first layers is much simpler to converge than for 
+the latter gates. The local minimas presented in comparing layers 4 and 6 
+demonstrates the need to reduce gate count to simplify the optimisation process. 
 
+
+
+\newpage 
 \section{Outlook and Conclusions}
 
 [add in the conclusion, large hedges are suboptimal, and traders underhedge anyways]
