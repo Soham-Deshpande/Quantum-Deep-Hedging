@@ -572,28 +572,71 @@ we can describe such system to be in the state
 $|0\rangle$ with some amplitude $\alpha$ and in $|1\rangle$ with amplitude $\beta$. 
 This can be represented  as
 \begin{equation}\label{eq51}
-|\psi\rangle = \alpha|0\rangle + \beta|1\rangle
+  |\psi\rangle = \alpha|0\rangle + \beta|1\rangle = \alpha\begin{pmatrix} 
+    1\\0\end{pmatrix} + \beta\begin{pmatrix}0\\1\end{pmatrix}
 \end{equation}
 for 
 some $\alpha$ and $\beta$ such that $|\alpha|^2+|\beta|^2 = 1$; 
-we can refer to this as a superposition. 
+we can refer to this as a superposition of the states $|0\rangle$ and $|1\rangle$. 
 If measured in the standard basis, we would expect the outcome to be $|k\rangle$ 
 with a certain probability, this outcome resulting in the output state of the 
-measurement gate to also be $|k\rangle$. This would mean our state $|\psi\rangle$
-is irreversibly lost; we refer to this as a collapse of state. Each qubit can 
+measurement gate to also be $|k\rangle$. This would mean our initial state $|\psi\rangle$
+is irreversibly lost; we refer to this as a collapse of state.
+\newp 
+Each qubit can 
 be thought of as a vector, $\bold{v}$, on a Bloch's sphere which can be represented in two 
-basis: $\theta$ and $\psi$. $\theta$ is the angle between $\bold{v}$ and the 
-z-axis. $\psi$ becomes the angle between $\bold{v}$ and the x-axis. Considering 
+basis: $\theta$ and $\varphi$. $\theta$ is the angle between $\bold{v}$ and the 
+z-axis. $\varphi$ becomes the angle between $\bold{v}$ and the x-axis. Considering 
 a more general parameterisation of 
 \ref{eq51} gives us 
-\begin{equation}
-  |\psi\rangle = \cos (\frac{\theta}{2})e^{i\psi_0}|0\rangle + \sin(\frac{\theta}
-  {2})e^{i\psi_{1}}|1\rangle
+\begin{equation}\label{hilbert1}
+  |\psi\rangle = \cos (\frac{\theta}{2})|0\rangle + \sin(\frac{\theta}
+  {2})e^{i\varphi}|1\rangle
 \end{equation}
-TALK MORE HERE
+\begin{figure}[h!]
+  \centering 
+  \includegraphics[width=\linewidth]{blochsphere.jpg}
+  \caption{Bloch sphere}
+  \label{fig:bloch}
+\end{figure}
+\newp 
+\subsubsection{Tensor Products}
+Tensor products, $\otimes$, to allow us to combine vector spaces. Lets consider 
+a two qubit system:
+\begin{equation}
+  |\psi\rangle = \alpha_0|0\rangle + \alpha_1|1\rangle \text{  and  }
+  |\phi\rangle = \beta_01\rangle  + \beta_1|1\rangle
+\end{equation}
+their tensor product becomes:
+\begin{equation}
+  |\psi\rangle \otimes |\phi\rangle = 
+  \alpha_0\beta_0|00\rangle + 
+  \alpha_0\beta_1|01\rangle + 
+  \alpha_1\beta_0|10\rangle + 
+  \alpha_1\beta_1|11\rangle  
+\end{equation}
+\subsubsection{N-qubit systems}
+The Bloch sphere, figure \ref{fig:bloch}, allows us to visualise all the pure states and the rotations taken 
+on $\bold{v}$. 
+The space of all the possible orientations of $\psi$ is called the Hilbert space. 
+Formally a Hilbert space, $\mathcal{H}$, is a vector space which is an inner product space 
+over $\mathcal{C}$ that is also complete with respect to the norm. For a single 
+qubit the state space is $\mathbb{C}^2$, a 2-dimensional Hilbert space, satisfying 
+\ref{hilbert1}. When extending to n qubits, the Hilbert space becomes 
+\begin{equation}
+  \mathcal{H}_n = \mathbb{C}^2 \otimes \mathbb{C}^2 \otimes ... \otimes \mathbb{C}^2 
+  =(\mathbb{C}^2)^{\otimes n} = \mathbb{C}^{2^n}
+\end{equation}
+The computational basis for $\mathcal{H}_n$ consists of all the possible n-bit strings:
+\begin{equation}
+  \{|x_1x_2...x_n\rangle\}, \text{ where } x_i \in \{0,1\}
+\end{equation}
+There are $2^n$ such basis states, each representing a classical bit string\\
+(e.g. $|00...0\rangle$,$|00...1\rangle$,...,$|11...1|\rangle$). 
+
+
 \newp
-When extending to a n-qubit system
-\newp
+\subsection{Quantum Operators}
 Before forming quantum circuits, we must first understand how quantum gates operate. 
 Quantum gates can be thought of as fixed unitary operations on selected qubits, 
 often represented with a $U$. There are many gates but the ones we are concerned 
@@ -734,34 +777,62 @@ where $x\in\{0,1\}^n$ represents a bit string of measurement outcomes. The goal
 of the QCBM now becomes to find optimal parameters of $\theta$ such that the 
 output probability distribution replicates that of the target, letting $p_{\theta}
 (x)$ approach $\chi_d$.
+\subsection{Implementation}
+The distribution to be learnt could not simply be the price at each time stamp, 
+as sampling the QCBM would remove any time component associated. Many ideas were tested 
+but the final design involved learning the distribution of log returns. This was 
+acceptable as we would be simulating many paths and less focussed on the given 
+price at each point. Formally, we are learning $r$, the log returns, and propagating 
+the series using 
+\begin{equation}
+  S_t = S_{t-1}e^{r_t}
+\end{equation}
+At each time step, the QCBM is sampled to gain a log return to be used to generate 
+the next value. Limitations of this can involve lack of volatility clustering which 
+can make it unsuitable for time-series prediction, though uses a similar technique 
+to classical methods. In the results section I explore whether this method does 
+provide a better hedge or not.
 \newp
 Implementation of the QCBM involved a few more steps. The target distribution 
 is of log returns, so the market data had to be converted into the appropriate 
 format. Before using the QCBM, the input data must also be discretised. This 
 involves binning the log returns into $2^n$ bins, where $n$ is the number of 
-qubits in the system. 
+qubits in the system. The value of $n$ is chosen based on the accuracy desired, 
+with larger values of $n$ allowing for more 'bins', leading to better expressibility.
+Making $n$ too large can lead to issues with optimisation and giving way to the 
+barren plateau phenomenon.
+\newp
 The training process then involves minimising a loss function, in this case using 
 the Kullback-Leibler(KL) Divergence. 
 \begin{equation}
 \mathcal{L}_{KL}(\theta) = \sum_{x \in \{0,1\}^n}q(x)log\bigl( \frac{q(x)}{p_{\theta(x)}}\bigr)
 \end{equation}
-\newp
 Optimisation of these parameters was left to the PennyLane[ref here] package. 
 The optimiser chosen is Adam, a gradient-descent optimiser with adaptive 
 learning rates.
 \newp
 The ansatz for this quantum circuit was varied, testing multiple architectures
-to explore the effects
+to explore the effects, expanded on further in section 6.2.
 \newp
-The ansatz for this quantum circuit consists of 7 layers
-of 1-qubit gates with entangling layers in between them. These are 
-entangled using the CNOT gates as found in the appendix. The number of wires 
-needed depends on the precision required for the generated data. The estimated
-precision is 12-bit, so the samples are able to take $2^{12}$ different values in 
-the range of $ (v_{min} - \epsilon, v_{max} + \epsilon )$, where $\epsilon > 0 $
-allows data to be generated that lie outside the range $(v_{min},v_{max})$ of the 
-original data.
-\newp
+The final pipeline for the QCBM is as follows:
+\begin{enumerate}
+  \item Pre-processing of market data
+  \item Binning/discretising the input data
+  \item Constructing the PQC for the QCBM
+  \item Comparison of QCBM's probability distribution to target distribution using
+  KL Divergence
+  \item Optimisation of QCBM's parameters, $\theta$
+  \item Analysis of synthetic distribution
+\end{enumerate}
+
+\begin{figure}[h!]
+  \centering 
+  \includegraphics[scale=0.35]{Overview.png}
+  \caption{Overview of the QCBM design}
+  \label{fig:overview}
+\end{figure}
+
+\newpage
 \subsection{Barren Plateau}
 A point of concern when searching for the optimal set of $\theta s$ is the large 
 search space, here we may observe issues such as barren plateau(BP). BP 
@@ -918,7 +989,7 @@ and maps as 'spiders' and 'wires'.
 At the heart of ZX calculus are two types of generators: Z-spiders and X-spiders,
 represented by green and red nodes respectively. First looking at the Z-spider: 
 \begin{equation}
-  Z^n_m[\alpha] = |0\rangle^{\otimes n}\lange0|^{\otimes m}+e^{i\alpha}
+  Z^n_m[\alpha] = |0\rangle^{\otimes n}\langle0|^{\otimes m}+e^{i\alpha}
   |1\rangle^{\otimes n}\langle1|^{\otimes m}
 \end{equation}
 where m is the number of inputs, n is the number of outputs and $\alpha$ is the 
@@ -961,17 +1032,6 @@ into a quantum circuit with potentially less non-Clifford gates. This optimisati
 is implemented in the Python PyZX package[ref here]. I explore the effects of this 
 further in the results section.
 \newpage
-\subsection{Design}
-The final pipeline for the project is as follows:
-\begin{enumerate}
-  \item Pre-processing of market data
-  \item Binning/discretising the input data
-  \item Constructing the PQC for the QCBM
-  \item Comparison of QCBM's probability distribution to target distribution using
-  KL Divergence
-  \item Optimisation of QCBM's parameters, $\theta$
-  \item Analysis of synthetic distribution
-\end{enumerate}
 \section{Results}
 Putting the theory into practice offered insights into the strengths and weaknesses 
 of the model. This section aims to provide quantitative comparisons between the 
@@ -1302,7 +1362,7 @@ known that VaR has a non-subadditivity constraint, meaning VaR for different por
 cannot be added together. For these reasons we opt to use Conditional Value at 
 Risk, a more sophisticated tool designed to overcome the given limitations. 
 \newp 
-CVaR focusses on measuring the risk of extreme losses. Instead of considering of 
+CVaR focusses on measuring the risk of extreme losses. Instead of 
 considering the probability of losing a given amount, we instead focus on how 
 much is lost in the given quantile. This quantifies our tail risk, making it 
 appropriate for evaluating the heavy tails of our market generators. Intuitively 
