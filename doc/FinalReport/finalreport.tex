@@ -171,11 +171,27 @@ recently observed non-parametric models that harness neural networks and machine
 learning which aim to demonstrate high accuracy on out-of-sample forecasts.
 \newp
 An alternative approach that has recently emerged utilises the power of 
-quantum computing. The introduction of parameterised quantum circuits(PQCs) have 
-opened up new pathways for navigating complex, large scale time series datasets. 
-Through rotation gates and quantum entanglement, we are able to learn complex 
-distributions and relationships. 
+quantum computing.
+The introduction of parameterised quantum circuits(PQCs) have 
+opened up new pathways for navigating complex, large scale time series datasets.
+Unlike classical models that assume independence between observations, quantum 
+models inherently operate within Hilbert space, where entangled bits naturally 
+encode correlations and non-local dependencies, therefore offer a rich representational 
+capacity.
+\newp 
+At the heart of this capability is the Born rule, a foundational principle that 
+governs how measurement probabilities are derived from the amplitudes of a 
+quantum state. This non-linear mapping from complex amplitudes to real probabilities 
+allows the model to intrinsically learn probabilistic distributions rather than 
+pointwise outputs. 
 \newp
+Furthermore, quantum entanglement allows multiple qubits to represent and propagate 
+join dependencies that would require exponential resources to simulate classically. 
+Within financial time series, where shocks and jumps can affect multiple assets 
+non-linearly, quantum circuits can more naturally encode this behaviour. This 
+naturally makes these models well-suited to model high volatility, high peaks, 
+and Black-Swan events that are poorly modelled by continuous Gaussian processes. 
+\newp 
 In this research, I aim to tackle the problem 
 of generating synthetic financial data, addressing issues that come about from 
 using a classical method, particularly the estimation of tail risk and skewness. 
@@ -195,10 +211,9 @@ This paper will aim to add to the existing literature on risk management for
 financial firms as well as providing a framework for generating synthetic 
 data. In addition to that, I aim to extend to the QCBM research that exists 
 currently, noting down any behaviours that may be of interest to the curious 
-and potential 
-experts in the field. 
-\clearpage
+and potential experts in the field.
 
+\newpage
 \section{Related Literature}
 To place this research within the context of existing literature, we can split 
 the project into 2 components: the market generator, and 
@@ -258,13 +273,7 @@ In quantum reservoir computing,
 the ability to retain information from past inputs plays a key role in processing 
 temporal series and producing future predictions
 \autocite{franceschetto_harnessing_2024,fujii_quantum_2020,garcia-beni_squeezing_2024,mujal_time-series_2023}.
-\newp
-This research aims to combine the needs of financial firms in hedging portfolios
-using realistic market models by utilising QCBMs as a tool 
-for simulating paths in combination with deep hedging engines for learning 
-optimal policies. A comparison will be made against hedging under Merton-Jump 
-diffusion. 
-\clearpage
+\newpage
 \section{Markets and Derivatives}
 The market, though inherently can be thought of as a completely random process,
 where bids and asks are fulfilled, can be modelled as a stochastic process. The 
@@ -366,7 +375,7 @@ given asset $i$ a specified time $T$ at price $K$.
 \subsubsection{Options}
 The two types of options going to be explored are Puts and Calls; a Call option 
 gives the owner the right but not the obligation to buy a given asset $i$ at 
-a specified price $K$ at time $T$. Similar to the Call, a Put option gives the 
+a specified price(Strike price) $K$ at time $T$. Similar to the Call, a Put option gives the 
 owner the right but not the obligation to sell a given asset $i$ at a price $K$ 
 at time $T$. If the owner can exercise the option any time up to $T$, we call 
 this an American option. For the purposes of this research, I will only be 
@@ -378,7 +387,7 @@ C_T = max(0,S_T-K)
 \begin{equation}
 P_T = max(0,K-S_T)
 \end{equation}
-
+where $S_T$ is the price of the underlying at time $T$. 
 
 
 \subsection{Market Data}
@@ -484,7 +493,7 @@ SDE.
 \end{equation}
 where $W_t \text{ and } N_t$ are Weiner and Poisson processes respectively. 
 $\lambda$ represents the intensity of the jumps, $\alpha$ is the drift rate
-(expected return), and $k$ is the expected jump size. 
+(expected return), $y_t - 1$ is the relative jump size with $k$ being the mean. 
 Solving the equation gives us an exponential L\'{e}vy model described by 
 \begin{equation}
   S_t = S_0e^{\mathcal{L}_t}
@@ -495,6 +504,7 @@ We can also define $\mathcal{L}_t$ to be
   \mathcal{L}_t = (\alpha - \frac{\sigma^2}{2}-\lambda k)t + \sigma W_t + 
   \sum^{N_t}_{i=1}Y_i
 \end{equation}
+$\sum_{i=1}^{N_t}Y_i$ being the compound Poisson process. 
 \subsection{Assumptions \& Limitations}
 Through inspection of the equations, we can observe the following assumptions:
 \begin{enumerate}
@@ -571,40 +581,121 @@ we can describe such system to be in the state
 $|0\rangle$ with some amplitude $\alpha$ and in $|1\rangle$ with amplitude $\beta$. 
 This can be represented  as
 \begin{equation}\label{eq51}
-|\psi\rangle = \alpha|0\rangle + \beta|1\rangle
+  |\psi\rangle = \alpha|0\rangle + \beta|1\rangle = \alpha\begin{pmatrix} 
+    1\\0\end{pmatrix} + \beta\begin{pmatrix}0\\1\end{pmatrix}
 \end{equation}
 for 
 some $\alpha$ and $\beta$ such that $|\alpha|^2+|\beta|^2 = 1$; 
-we can refer to this as a superposition. 
+we can refer to this as a superposition of the states $|0\rangle$ and $|1\rangle$. 
 If measured in the standard basis, we would expect the outcome to be $|k\rangle$ 
 with a certain probability, this outcome resulting in the output state of the 
-measurement gate to also be $|k\rangle$. This would mean our state $|\psi\rangle$
-is irreversibly lost; we refer to this as a collapse of state. Each qubit can 
+measurement gate to also be $|k\rangle$. This would mean our initial state $|\psi\rangle$
+is irreversibly lost; we refer to this as a collapse of state.
+\newp 
+Each qubit can 
 be thought of as a vector, $\bold{v}$, on a Bloch's sphere which can be represented in two 
-basis: $\theta$ and $\psi$. $\theta$ is the angle between $\bold{v}$ and the 
-z-axis. $\psi$ becomes the angle between $\bold{v}$ and the x-axis. Considering 
+basis: $\theta$ and $\varphi$. $\theta$ is the angle between $\bold{v}$ and the 
+z-axis. $\varphi$ becomes the angle between $\bold{v}$ and the x-axis. Considering 
 a more general parameterisation of 
 \ref{eq51} gives us 
-\begin{equation}
-  |\psi\rangle = \cos (\frac{\theta}{2})e^{i\psi_0}|0\rangle + \sin(\frac{\theta}
-  {2})e^{i\psi_{1}}|1\rangle
+\begin{equation}\label{hilbert1}
+  |\psi\rangle = \cos (\frac{\theta}{2})|0\rangle + \sin(\frac{\theta}
+  {2})e^{i\varphi}|1\rangle
 \end{equation}
-TALK MORE HERE
+\begin{figure}[h!]
+  \centering 
+  \includegraphics[width=\linewidth]{blochsphere.jpg}
+  \caption{Bloch sphere}
+  \label{fig:bloch}
+\end{figure}
+\newp 
+\subsubsection{Tensor Products}
+Tensor products, $\otimes$, to allow us to combine vector spaces. Lets consider 
+a two qubit system:
+\begin{equation}
+  |\psi\rangle = \alpha_0|0\rangle + \alpha_1|1\rangle \text{  and  }
+  |\phi\rangle = \beta_0|1\rangle  + \beta_1|1\rangle
+\end{equation}
+their tensor product becomes:
+\begin{equation}
+  |\psi\rangle \otimes |\phi\rangle = 
+  \alpha_0\beta_0|00\rangle + 
+  \alpha_0\beta_1|01\rangle + 
+  \alpha_1\beta_0|10\rangle + 
+  \alpha_1\beta_1|11\rangle  
+\end{equation}
+\subsubsection{N-qubit systems}
+The Bloch sphere, figure \ref{fig:bloch}, allows us to visualise all the pure states and the rotations taken 
+on $\bold{v}$. 
+The space of all the possible orientations of $\psi$ is called the Hilbert space. 
+Formally a Hilbert space, $\mathcal{H}$, is a vector space which is an inner product space 
+over $\mathcal{C}$ that is also complete with respect to the norm. For a single 
+qubit the state space is $\mathbb{C}^2$, a 2-dimensional Hilbert space, satisfying 
+\ref{hilbert1}. When extending to n qubits, the Hilbert space becomes 
+\begin{equation}
+  \mathcal{H}_n = \mathbb{C}^2 \otimes \mathbb{C}^2 \otimes ... \otimes \mathbb{C}^2 
+  =(\mathbb{C}^2)^{\otimes n} = \mathbb{C}^{2^n}
+\end{equation}
+The computational basis for $\mathcal{H}_n$ consists of all the possible n-bit strings:
+\begin{equation}
+  \{|x_1x_2...x_n\rangle\}, \text{ where } x_i \in \{0,1\}
+\end{equation}
+There are $2^n$ such basis states, each representing a classical bit string\\
+(e.g. $|00...0\rangle$,$|00...1\rangle$,...,$|11...1|\rangle$). 
+
+\subsubsection{Entanglement}
+Quantum entanglement is a fundamental feature of quantum mechanics, allowing 
+qubits to be deeply correlated to the point their joint state cannot be represented 
+as a product of their individual states. Measurement of one state will have an 
+instantaneous impact on the other entangled qubit, determining the outcome for both 
+qubits. 
+Entanglement emerges from the structure of the tensor product. A state 
+$|\psi\rangle \in \mathbb{C}^2 \otimes \mathbb{C}^2$ is entangled if there are 
+correlations between measurement outcomes of each qubit that cannot be explained
+by any product of the independent states, we cannot decompose it into 
+$|\psi\rangle = |\psi_A\rangle \otimes |\psi_B\rangle$ for some $\psi_A \in \mathcal{H}_A$
+and $|\psi_B\rangle \in \mathcal{H}_B$.
+
+
 \newp
-When extending to a n-qubit system
-\newp
+\subsection{Quantum Operators}
 Before forming quantum circuits, we must first understand how quantum gates operate. 
-Quantum gates can be thought of as fixed unitary operations on selected qubits, 
-often represented with a $U$. There are many gates but the ones we are concerned 
-with for this project are the $T$, $Rx$, $Ry$, $Rz$ and $CNOT$ gates. Given an 
-angle $\theta$ we can form the universal gates: 
+In quantum computing, the evolution of quantum states is governed by unitary 
+operations, linear transformations $U: \mathcal{H} \rightarrow \mathcal{H}$ satisfying 
+$U^{\dagger}U = UU^{\dagger} = I$. These are implemented as quantum gates, acting on 
+the qubits with single-qubit gates being represented by $2\times2$ unitary matrices,
+and multi-qubit by tensor products. There are many gates but the ones we will 
+discuss the ones used in this project. 
+\newp
+The Pauli group is a foundational set of operators that consists of three Pauli 
+matrices and an identity. These form an orthonormal basis for $2\times 2$ Hermitian 
+matrices, $P=P^{\dagger}$ where $P^{\dagger}$ is the conjugate transpose, and are 
+crucial for in defining measurements, quantum error correction, and stabiliser 
+circuits. For a single qubit, we can define the Pauli group, $\mathcal{P}$, with 
+phases $\{\pm1, \pm i\}$ to be 
+\begin{equation}
+  \mathcal{P} = \{\pm I, \pm iI, \pm X, \pm iX, \pm Y, \pm iY, \pm Z, \pm iZ\}
+\end{equation}
+where
+\begin{equation}
+X = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}, \quad
+Y = \begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix}, \quad
+Z = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}, \quad
+I = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix} \quad
+\end{equation}
+\newp 
+We can extend this to the Pauli rotation gates which 
+allow you to rotate a vector around the Bloch sphere. The first one, $R_x(\theta)$,
+allows us to rotate a qubit around the x-axis and is given by:
 $$
 R_x(\theta)& = \coloneqq 
 \begin{bmatrix}
 \cos(\theta/2) & -i\sin(\theta/2) \\
 -i\sin(\theta/2) & \cos(\theta/2)
 \end{bmatrix}
-$$
+$$ 
+Likewise the $R_y$ and $R_z$ are defined similarly, allowing rotations around the 
+y and z axes.
 $$
 R_y(\theta) = \coloneqq 
 \begin{bmatrix}
@@ -619,13 +710,11 @@ e^{-i\theta/2} & 0 \\
 0 & e^{i\theta/2}
 \end{bmatrix}
 $$
-$$
-T = \coloneqq 
-\begin{bmatrix}
-1 & 0 \\
-0 & e^{-i\pi/4}
-\end{bmatrix}
-$$
+It is worth noticing the Pauli X gate is equivalent to a rotation of $\pi$ in the 
+x-axis, which can also be represented as $R_x(\pi)$. 
+Another key gate is the CNOT gate, a two-qubit gate used to generate entanglement. 
+The CNOT acts on a control and target qubit, flipping the target if the control 
+qubit is in the $|1\rangle$ state. 
 $$
 CNOT =
 \begin{pmatrix}
@@ -635,16 +724,73 @@ CNOT =
 0 & 0 & 1 & 0
 \end{pmatrix}
 $$
-Universal gates, Clifford Gates and non-Clifford gates 
+These entangled states are crucial for learning complex distributions, allowing us 
+to faithfully create synthetic market data. 
+\subsection{Clifford and non-Clifford Gates}
+Often articles focus on the benefits of quantum computing being superposition 
+and entanglement but we can think beyond that and consider those gates that can't
+be efficiently simulated classically, the untold heroes. 
+The operations we have discussed previously such as Pauli $X$, $CNOT$ etc. can be put 
+into two main categories: Clifford and non-Clifford. The Clifford group involves 
+those gates that can be simulated efficiently classically, with non-Clifford 
+containing those that are responsible for the quantum speed ups observed such as 
+the T-gates. 
+\newp 
+Clifford group contains those gates that map Pauli operators to other Pauli 
+operators under conjugation. We can formally say that for a Clifford unitary, $U$, 
+and for every Pauli operator, $P$, $UPU^{\dagger}$ is still a Pauli operator. 
+These, however, do not form a universal set of quantum gates so require 
+non-Clifford operators. Though not able to represent every possible operation,
+they still serve a large purpose, typically being used in quantum error correction 
+algorithms or for testing entanglement. 
+\newp 
+Non-Clifford gates are those that cannot be simulated efficiently on a classical 
+machine, a common being the T-gate. 
+\begin{equation}
+  T = 
+  \begin{pmatrix} 
+1 & 0 \\ 
+0 & e^{i\pi/4} 
+\end{pmatrix} 
+\end{equation}
+An important property that defines this as non-Clifford is the fact that is doesn't 
+preserve the Pauli group under conjugation. Formally 
+\begin{equation}
+  TXT^{\dagger} \neq \text{Pauli Operator}
+\end{equation}
+Another important gate is the Toffoli gate which serves as a three-qubit gate 
+that applies a NOT operation the third qubit if the first two qubits are in the 
+$|1\rangle$ state.
+\newp 
+Non-Clifford gates can be non-trivial to implement unfortunately. 
+One such method for implementation of non-Cliffords includes magic state 
+distillation, using ancilla bits to aid the computation, adding large computational 
+costs. These also often require non-transversal methods which can increase the 
+error propagation, making a fault tolerant device ever more difficult. For this 
+reason, we would like a framework to reduce the T-gate count in a circuit.
+
 \subsection{Born Rule}
 An essential part of quantum computing involves the existence of the Born
-Rule. Born's measurement rule states that:
+Rule. Given a quantum state $|\psi\rangle \in \mathcal{H}$, the Born rule states 
+the probability of measuring an outcome $x \in \{0,1\}^n$ in the computational 
+basis is
 \begin{equation}
 p(x) = |\langle x|\psi(\theta)\rangle|^2
 \end{equation} where 
 \begin{equation}
 |\psi(\theta)\rangle = U(\theta)|0\rangle^{\otimes n}
 \end{equation}
+This means that the probability distribution over all possible $2^n$ outcomes 
+is derived from the squared magnitudes of the amplitudes in the quantum state 
+vector. Unlike classical probabilistic models, where probabilities are assigned 
+directly, quantum probabilities arise from the inner product between the quantum 
+and measurement state, through the application of the Born rule. As such, the 
+quantum devices are able to leverage superposition and interference effects that 
+have no classical counterpart. This makes it suitable for representing probability 
+distributions with non-trivial structures such as financial time-series with jumps, 
+or fat-tailed behaviours.
+\newp
+LOOK INTO CHANGING:\\
 The state $|\psi(\theta)\rangle$ is generated by evolving state $|0\rangle$
 according to a Hamiltonian $H$ that is constructed from gates. Once combined, the 
 gates form a parameterised quantum circuit which is parameterised by using the 
@@ -661,25 +807,15 @@ the target distribution involves minimising the parameters of the circuit $U(\th
 a process once convergence is reached, will generate accurate samples 
 \cite{liu_differentiable_2018}.
 
-\subsection{State Preparation}
-We require state preparation to transfer the classical data onto the 
-Hilbert space. This involves a function $\phi$ that maps the input vector to 
-an output label. There are many encoding schemes, each of which aim to offer 
-high information density and low error rates; main methods include: basis, amplitude,
-angle encoding, and QRAM. 
-\\
-Without the use of ancillary qubits, we can expect an exponential circuit depth
-to prepare an arbitrary quantum state. Using them we can reduce the depth to be 
-sub-exponential scaling, with recent advancements reaching $\Theta(n)$ given $O(n^2)$
-ancillary qubits
-\cite{shaib_efficient_2023,zhang_quantum_2022}.
-
-
 
 \subsection{Parameterised Quantum Circuits}
-Parameterised quantum circuits.
-Describe what ansatz is.
-An ansatz can be thought of as a trial state that is used as the starting point 
+Parameterised quantum circuits(PQCs) are a powerful framework consisting of rotation 
+and entanglement gates for hybrid quantum-classical algorithms. A PQC is a quantum 
+circuit with rotation gates with parameters $\theta = (\theta_1, \theta_2...\theta_n)$
+which can be tuned classically to give desired results. These rotations are often 
+interleaved with entanglement gates such as CNOTs. The design of the PQC is 
+dependant on the choice of ansatz used; an ansatz can be thought of as a trial 
+state that is used as the starting point 
 for the optimisations. It's an empty canvas with gates and parameters that need 
 to be tuned to give meaning.
 \newp 
@@ -703,44 +839,134 @@ the effect of the circuit ansatz on the end result, showing slight modifications
 to entanglement structures can have a large effect on the trainability and 
 expressibility. 
 
-\clearpage
+\subsection{Basis Encoding}
+When modelled data is drawn from a continuous domain, log returns, the output 
+space must be discretized to be representable in the computational basis. We 
+achieve this through the process of basis encoding, involving binning the 
+input data. Formally, given a continuous random variable, $X \in \mathbb{R}$, 
+we discretize this into $2^n$ bins, where each bin corresponds to a 
+basis state $|x\rangle$ for $x \in \{0,1\}^n$.
+This encoding induces a discrete probability distribution over the basis states 
+which becomes the empirical target distribution for the training the quantum circuit;
+ the PQC can then learn to approximate this histogram-like distribution using the 
+Born rule.
+It is important to note that the resolution of the learnt distribution is therefore 
+limited by the number of qubits, $n$, so should be a consideration when designing 
+the PQC. 
+\newp 
+This process allows us to use classical statistical divergences such as Kullback-Leibler 
+divergence for loss function since both the model and data reside in a common 
+discrete sample space. 
+\newpage
 \section{Quantum Circuit Born Machine}
-Given a dataset $D = \{x_1, x_2.. x_n\}$ consisting of n samples and obeys a 
-given distribution $\chi_d$, we would like the QCBM to learn the distribution 
-and generate synthetic data points that are of the distribution $\chi_s$ such that
-$\chi_s$ approximates $\chi_d$.
-The QCBM is a subclass of parameterised quantum circuits, 
-here the quantum circuit contains parameters which are updated during a training 
-process. The QCBM takes the product state $\ket{0}$ as an input, and through an 
-evolution, transforms into a final state $\ket{\phi_0}$ by a sequence of unitary 
-gates. This can then be measured to obtain a sample of bits 
-$x \sim p_\theta (x_s)=|\bra{x}\ket{\phi_\theta}|^2$ . By training the model we 
-are aiming to let $p_\theta$ approach $\chi_d$. 
-\\
-The ansatz for this quantum circuit consists of 7 layers
-of 1-qubit gates with entangling layers in between them. These are 
-entangled using the CNOT gates as found in the appendix. The number of wires 
-needed depends on the precision required for the generated data. The estimated
-precision is 12-bit, so the samples are able to take $2^{12}$ different values in 
-the range of $ (v_{min} - \epsilon, v_{max} + \epsilon )$, where $\epsilon > 0 $
-allows data to be generated that lie outside the range $(v_{min},v_{max})$ of the 
-original data.
-\\
-The QCBM takes a $n \times m$ matrix of parameters in the range $(-\pi, \pi)$ as 
-input, in the form of a dictionary. Each angle takes one of $2^k$ discrete values, 
-where $k$ is a model parameter. The resulting space therefore spans to: 
-$(2^m)^{n\cdot m}$.
+The Quantum Circuit Born Machine(QCBM) is an extension of PQCs, designed with the 
+intent of probabilistic generation at its core. It consists of a PQC with trainable 
+parameters, $\theta$. These parameters can be tuned through an optimisation process 
+such that sampling the PQC replicates a target distribution. This is the model that 
+is leveraged to generate the synthetic market data.
+\newp
+Formally, given a dataset $D = \{x_1, x_2.. x_n\}$ consisting of $n$ market observations and 
+obeys a given distribution $\chi_d$, we would like the QCBM to replicate the distribution 
+and, once sampled, generate synthetic data points that are of the distribution $\chi_s$ 
+such that $\chi_s$ approximates $\chi_d$.
+\newp
+Let $U(\theta)$ be a PQC acting on $n$ qubits, where $\theta \in \mathcal{R}^m$ 
+is a vector of tunable parameters. Initially, the circuit will prepare a quantum 
+state:
+\begin{equation}
+|\psi(\theta)\rangle = U(\theta)|0\rangle^{\otimes n}
+\end{equation}
+$|0\rangle^{\otimes n}$ representing all the qubits in the computational basis
+state $|0\rangle$.\\
+Upon measurement in the computational basis, this state will produce a probability 
+distribution according to Born's rule: 
+\begin{equation}
+p_{\theta}(x) = |\langle x|\psi(\theta)\rangle|^2
+\end{equation}
+where $x\in\{0,1\}^n$ represents a bit string of measurement outcomes. The goal 
+of the QCBM now becomes to find optimal parameters of $\theta$ such that the 
+output probability distribution replicates that of the target, letting $p_{\theta}
+(x)$ approach $\chi_d$.
+\subsection{Implementation}
+The distribution to be learnt could not simply be the price at each time stamp, 
+as sampling the QCBM would remove any time component associated. Many ideas were tested 
+but the final design involved learning the distribution of log returns. This was 
+acceptable as we would be simulating many paths and less focussed on the given 
+price at each point. Formally, we are learning $r$, the log returns, and propagating 
+the series using 
+\begin{equation}
+  S_t = S_{t-1}e^{r_t}
+\end{equation}
+At each time step, the QCBM is sampled to gain a log return to be used to generate 
+the next value. Limitations of this can involve lack of volatility clustering which 
+can make it unsuitable for time-series prediction, though uses a similar technique 
+to classical methods. In the results section I explore whether this method does 
+provide a better hedge or not.
+\newp
+Implementation of the QCBM involved a few more steps. The target distribution 
+is of log returns, so the market data had to be converted into the appropriate 
+format. Before using the QCBM, the input data must also be discretised. This 
+involves binning the log returns into $2^n$ bins, where $n$ is the number of 
+qubits in the system. The value of $n$ is chosen based on the accuracy desired, 
+with larger values of $n$ allowing for more 'bins', leading to better expressibility.
+Making $n$ too large can lead to issues with optimisation and giving way to the 
+barren plateau phenomenon.
+\newp
+The training process then involves minimising a loss function, in this case using 
+the Kullback-Leibler(KL) Divergence. 
+\begin{equation}
+\mathcal{L}_{KL}(\theta) = \sum_{x \in \{0,1\}^n}q(x)log\bigl( \frac{q(x)}{p_{\theta(x)}}\bigr)
+\end{equation}
+Optimisation of these parameters was left to the PennyLane[ref here] package. 
+The optimiser chosen is Adam, a gradient-descent optimiser with adaptive 
+learning rates.
+\newp
+The ansatz for this quantum circuit was varied, testing multiple architectures
+to explore the effects, expanded on further in section 6.2.
+\newp
+The final pipeline for the QCBM is as follows:
+\begin{enumerate}
+  \item Pre-processing of market data
+  \item Binning/discretising the input data
+  \item Constructing the PQC for the QCBM
+  \item Comparison of QCBM's probability distribution to target distribution using
+  KL Divergence
+  \item Optimisation of QCBM's parameters, $\theta$
+  \item Analysis of synthetic distribution
+\end{enumerate}
 
+\begin{figure}[h!]
+  \centering 
+  \includegraphics[scale=0.32]{Overview.png}
+  \caption{Overview of the QCBM design}
+  \label{fig:overview}
+\end{figure}
 
+\newpage
 \subsection{Barren Plateau}
 A point of concern when searching for the optimal set of $\theta s$ is the large 
 search space, here we may observe issues such as barren plateau(BP). BP 
 insists that the gradient of the parameters of a given PQC will vanish exponentially 
-w.r.t the search space.
-\\ 
-Introduce proof of $\frac{\partial C}{\partial \theta} \rightarrow 0 $
-
-
+with respect to the search space. McClean[ref here] shows that for a PQC with $L$ layers in the form: 
+\begin{equation}
+  U(\theta) = \Pi_L^{l=1}U_l(\theta_l)W_l
+\end{equation}
+where $U_l(\theta_l)$ are parameterised gates and $W_l$ are fixed gates, and with 
+cost function:
+\begin{equation}
+E(\theta) = \bra{0}U(\theta)^\dagger HU(\theta)\ket{0}
+\end{equation}
+where $H$ is a Hermitian observable, the gradient variance vanishes exponentially,
+leaving us with the following relationship:
+\begin{equation}
+  Var[\partial_kC(\theta)] \leq \mathcal{O}\bigl(\frac{1}{2n}\bigr)
+\end{equation}
+for n-qubits. 
+\newp 
+This shows us to expect flat optimisation landscapes, leading to sub-optimal values
+of $\theta$ being learnt. This relationship also shows us why the ansatz chosen 
+makes a big difference on the learnability, something I further explore in the 
+next section. 
 \subsection{Architectures}
 The design of the ansatz can significantly affect the ability to learn and represent 
 the target distribution. The number of gates, depth, and entanglement structure
@@ -818,53 +1044,9 @@ implication of barren plateau. These issue made it unsuitable for use.
 \end{figure}
 \newpage
 
-\subsection{Clifford and non-Clifford Gates}
-Often articles focus on the benefits of quantum computing being superposition 
-and entanglement but we can think beyond that and consider those gates that can't
-be efficiently simulated classically, the untold heroes. 
-The operations we have discussed previously such as Pauli $X$, $CNOT$ etc. can be put 
-into two main categories: Clifford and non-Clifford. The Clifford group involves 
-those gates that can be simulated efficiently classically, with non-Clifford 
-containing those that are responsible for the quantum speedups observed such as 
-the T-gates. 
-\newp 
-Clifford group contains those gates that map Pauli operators to other Pauli 
-operators under conjugation. We can formally say that for a Clifford unitary, $U$, 
-and for every Pauli operator, $P$, $UPU^{\dagger}$ is still a Pauli operator. 
-These, however, do not form a universal set of quantum gates so require 
-non-Clifford operators. Though not able to represent every possible operation,
-they still serve a large purpose, typically being used in quantum error correction 
-algorithms or for testing entanglement. 
-\newp 
-Non-Clifford gates are those that cannot be simulated efficiently on a classical 
-machine, a common being the T-gate. 
-\begin{equation}
-  T = 
-  \begin{pmatrix} 
-1 & 0 \\ 
-0 & e^{i\pi/4} 
-\end{pmatrix} 
-\end{equation}
-An important property that defines this as non-Clifford is the fact that is doesn't 
-preserve the Pauli group under conjugation. Formally 
-\begin{equation}
-  TXT^{\dagger} \neq \text{Pauli Operator}
-\end{equation}
-Another important gate is the Toffoli gate which serves as a three-qubit gate 
-that applies a NOT operation the third qubit if the first two qubits are in the 
-$|1\rangle$ state.
-\newp 
-Non-Clifford gates can be non-trivial to implement unfortunately. These often 
-require non-transversal methods which can increase the error propagation.
-
-EXPLAIN A BIT MORE HERE
-
 
 
 \subsection{ZX Calculus}
-ZX Calculus as a method to optimise/minimise t gate count. introduce what a 
-non clifford gate is.
-\newp 
 ZX Calculus is a graphical language designed to express the relationships between 
 qubits based on category theory. Instead of thinking about the linear maps taking place
 in the form of matrices, we can reason about it in a diagrammatic way. This 
@@ -876,7 +1058,7 @@ and maps as 'spiders' and 'wires'.
 At the heart of ZX calculus are two types of generators: Z-spiders and X-spiders,
 represented by green and red nodes respectively. First looking at the Z-spider: 
 \begin{equation}
-  Z^n_m[\alpha] = |0\rangle^{\otimes n}\lange0|^{\otimes m}+e^{i\alpha}
+  Z^n_m[\alpha] = |0\rangle^{\otimes n}\langle0|^{\otimes m}+e^{i\alpha}
   |1\rangle^{\otimes n}\langle1|^{\otimes m}
 \end{equation}
 where m is the number of inputs, n is the number of outputs and $\alpha$ is the 
@@ -904,11 +1086,20 @@ and by symmetry
 \end{equation}
 The graphical rules of ZX calculus allow for spider fusions, copying and wire 
 transformations, all that correspond to those from category theory. It is crucial 
-to note that ZX calculus is universal for quantum computations, so any computation 
+to note/ that ZX calculus is universal for quantum computations, so any computation 
 to exist can be represented and reasoned about within this framework. 
 \subsubsection{Gate Optimisation}
-Gate optimisation section here.
-
+As mentioned above, non-Clifford gates can be very computationally intensive to 
+implement, therefore we would like to reduce any T-gates that don't need to be 
+in the circuit. 
+\newp 
+ZX calculus provides us with a framework to optimise the T-gate count by a process
+referred to as gadgetisation. This involves splitting a non-Clifford node into a 
+node of itself and a 'phase gadget',a phase that can explore the ZX diagram in 
+search of combination or cancellation.[ref here] The ZX diagrams can then be converted back 
+into a quantum circuit with potentially less non-Clifford gates. This optimisation 
+is implemented in the Python PyZX package[ref here]. I explore the effects of this 
+further in the results section.
 \newpage
 \section{Results}
 Putting the theory into practice offered insights into the strengths and weaknesses 
@@ -1240,7 +1431,7 @@ known that VaR has a non-subadditivity constraint, meaning VaR for different por
 cannot be added together. For these reasons we opt to use Conditional Value at 
 Risk, a more sophisticated tool designed to overcome the given limitations. 
 \newp 
-CVaR focusses on measuring the risk of extreme losses. Instead of considering of 
+CVaR focusses on measuring the risk of extreme losses. Instead of 
 considering the probability of losing a given amount, we instead focus on how 
 much is lost in the given quantile. This quantifies our tail risk, making it 
 appropriate for evaluating the heavy tails of our market generators. Intuitively 
@@ -1432,19 +1623,75 @@ indicates that there is something else affecting the QCBM's performance beyond
 just barren plateau. This effect was beyond the scope of this report but can be 
 investigated after this project. 
 \subsubsection{ZX Calculus}
-
+Reducing the T-gate count was essential to improve the trainability. 
 I first plotted the loss landscape for some of the gate combinations to visualise 
 how the loss changes with different gate pairs. As shown in the graphs, the 
 optimisation process for the first layers is much simpler to converge than for 
 the latter gates. The local minimas presented in comparing layers 4 and 6 
 demonstrates the need to reduce gate count to simplify the optimisation process. 
-
-
+\begin{figure}[h!]
+    \centering
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{landscape1.png}
+        \caption{Loss landscape for gates in the first 2 layers}
+        \label{fig:landscape1}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{landscape2.png}
+        \caption{Loss landscape for gates at an increased depth}
+        \label{fig:landscape2}
+    \end{minipage}
+\end{figure}
 
 \newpage 
-\section{Outlook and Conclusions}
+\section{Project Management}
 
-[add in the conclusion, large hedges are suboptimal, and traders underhedge anyways]
+\newpage
+\section{Outlook and Conclusions}
+This project was designed to investigate the quantum advantages as compared to 
+traditional techniques for deep hedging, and all the goals set out have been 
+fulfilled. Through thorough analysis of model performances, I am able to say that 
+the QCBM outperformed the Merton-Jump Diffusion model in modelling the fat tails 
+and skewness of the market data. 
+\newp
+In the context of hedging, the synthetic data generated would most likely not be 
+acceptable as the lack of volatility clustering may lead to suboptimal hedges 
+in the hedging engine. The overestimation of tail risk was also prevalent, possibly 
+leading to an over-hedge, minimising the potential upside of a trade. It should 
+also be said, while talking to oil traders, it came up that traders would often 
+under hedge their positions. This is due to the fact they are placing a directional 
+bet based on their reasoning, be it mathematical or due to experience. 
+This is a factor that is not considered but should be thought about when designing
+a hedging engine. This further emphasising the point that though the QCBM appears 
+superior in the chosen metrics, it may not be completely suitable for a hedging 
+engine. For further analysis, comparisons against machine learning techniques
+can be executed, deducing whether this method beats all methods of simulation on 
+classical devices. 
+\newp 
+I also explored issues with trainability, coming across a phenomenon where the 
+variance of the cost gradient increased, or appeared uncorrelated when dealing 
+with distributions with scattered high densities. Beyond this research, I would like 
+to explore this, mathematically reasoning the effect and mitigation techniques. 
+\newp 
+Optimisation techniques such as T-gate reduction using ZX calculus was also 
+explored, showing the strength of such representation. I believe this another 
+area of research that can be extended beyond this project, investigating 
+different gate reduction techniques, ones perhaps that may be better suited for 
+this nature of data. 
+\newp
+There is new research being done on Quantum Monte Carlo techniques, boasting
+superiority over classical quasi-monte carlo methods due to the truly random 
+nature of quantum mechanics. Moving beyond this paper, this technique can be 
+added easily to the current framework for simulation of asset prices and 
+deep hedging. 
+\newp
+This technique of generating synthetic data has applications beyond deep hedging 
+and quantitative finance. The framework set up can be adapted for use cases where 
+lack of training data is present, or for scenarios where the underlying distribution 
+is difficult to learn classically. 
 
 \clearpage
 \section{Appendix}
