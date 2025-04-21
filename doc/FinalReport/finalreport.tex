@@ -726,6 +726,23 @@ CNOT =
 $$
 These entangled states are crucial for learning complex distributions, allowing us 
 to faithfully create synthetic market data. 
+\subsection{Measurement}
+Measurement is a key part of quantum computing, allowing us to extract information 
+from quantum systems through projections onto a particular basis. The basis that 
+we measure in determines how we interpret the state of a given qubit. The most common 
+one used is the computational basis(Z-basis), which consists of the 
+two eigenstates of the Pauli-Z operator, states $|0\rangle$ and $|1\rangle$ 
+for a single qubit system and tensor products of these single-qubit states when 
+extending to multiple qubits. These states correspond to the eigenvalues 0 and 1, 
+respectively. The Pauli-Z mathematically represents a measurement along the z-axis
+of the Bloch sphere. When measuring, we are effectively projecting the quantum 
+state onto these eigenvectors, with the measurement probabilities determined 
+by squaring the magnitudes of state's components in the z-axis.
+\newp 
+Measurement in the X-basis is similar, we are now projecting the quantum state onto 
+the eigenstates of the Pauli-X operator. These are the 
+$|+\rangle = \frac{1}{\sqrt{2}}(|0\rangle+|1\rangle)$ and 
+$|-\rangle = \frac{1}{\sqrt{2}}(|0\rangle-|1\rangle)$ states. 
 \subsection{Clifford and non-Clifford Gates}
 Often articles focus on the benefits of quantum computing being superposition 
 and entanglement but we can think beyond that and consider those gates that can't
@@ -1086,8 +1103,10 @@ and by symmetry
 \end{equation}
 The graphical rules of ZX calculus allow for spider fusions, copying and wire 
 transformations, all that correspond to those from category theory. It is crucial 
-to note/ that ZX calculus is universal for quantum computations, so any computation 
+to note that ZX calculus is universal for quantum computations, so any computation 
 to exist can be represented and reasoned about within this framework. 
+\\
+ADD SPIDER RULES
 \subsubsection{Gate Optimisation}
 As mentioned above, non-Clifford gates can be very computationally intensive to 
 implement, therefore we would like to reduce any T-gates that don't need to be 
@@ -1645,10 +1664,25 @@ demonstrates the need to reduce gate count to simplify the optimisation process.
         \label{fig:landscape2}
     \end{minipage}
 \end{figure}
-
+The first attempt at T-gate optimisation included rounding all the $\theta$ values 
+for the PQC to the nearest $\frac{\pi}{8}$. This process allows us to use the 
+ZX-calculus reduction rules to reduce the T-gate count. Though this reduced the 
+number of non-Clifford gates in the circuit, the performance took a large hit. 
+There was a significant reduction in the standard deviation and excess kurtosis
+approximation. The loss landscape also indicated that first layers had less of an 
+effect on the QCBM performance so I tested only rounding the first two layers. 
+This led to better results with standard deviation being less affected though the 
+excess kurtosis was represented poorly. This trade-off is not acceptable from a 
+hedging standpoint as it would lead to a suboptimal hedge, leaving an investor 
+over-exposed or incurring more transaction costs.  
+\begin{figure}[h!]
+    \centering
+    \includegraphics[scale=0.5]{tgate.png}
+    \caption{Comparison of learned distributions}
+\end{figure}
 \newpage 
 \section{Project Management}
-
+Gantt chart and brief explanation here.
 \newpage
 \section{Outlook and Conclusions}
 This project was designed to investigate the quantum advantages as compared to 
